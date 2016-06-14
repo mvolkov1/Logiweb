@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="dataSourceStorage">
-  <data-source name="logiweb/Hibernate" uuid="96b0bbc0-7eb1-4bec-8042-75cb6bfe4009">
+  <data-source name="MySQL - logiweb@localhost" uuid="f5d648df-98e7-4117-9241-cf4f60cce099">
     <database-info product="MySQL" version="5.7.12-log" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.35 ( Revision: 5fb9c5849535c13917c2cf9baaece6ef9693ef27 )">
       <extra-name-characters>#@</extra-name-characters>
       <identifier-quote-string>`</identifier-quote-string>
     </database-info>
     <case-sensitivity plain-identifiers="lower" quoted-identifiers="lower"/>
     <database-model serializer="dbm" rdbms="MYSQL" format-version="2.5">
-      <schema id="1" name="jschool2"/>
+      <schema id="1" name="logiweb"/>
       <table id="2" parent="1" name="cargo"/>
       <table id="3" parent="1" name="city"/>
       <table id="4" parent="1" name="distance"/>
@@ -44,6 +44,7 @@
         <data-type>bigint(20)</data-type>
       </column>
       <column id="16" parent="2" name="cityIdEnd">
+        <mandatory>1</mandatory>
         <data-type>bigint(20)</data-type>
       </column>
       <index id="17" parent="2" name="cityIdEnd">
@@ -171,7 +172,7 @@
       </column>
       <column id="44" parent="5" name="monthHours">
         <mandatory>1</mandatory>
-        <data-type>decimal(4,1)</data-type>
+        <data-type>int(11)</data-type>
       </column>
       <column id="45" parent="5" name="status1">
         <mandatory>1</mandatory>
@@ -231,145 +232,121 @@
         <data-type>smallint(6)</data-type>
         <default-expression>&apos;0&apos;</default-expression>
       </column>
-      <column id="58" parent="6" name="vehicleId">
-        <data-type>bigint(20)</data-type>
-      </column>
-      <column id="59" parent="6" name="currentCityId">
+      <column id="58" parent="6" name="nItems">
         <mandatory>1</mandatory>
-        <data-type>bigint(20)</data-type>
+        <data-type>int(11)</data-type>
       </column>
-      <column id="60" parent="6" name="endCityId">
-        <mandatory>1</mandatory>
-        <data-type>bigint(20)</data-type>
-      </column>
-      <index id="61" parent="6" name="currentCityId">
-        <columns>currentCityId</columns>
-        <desc-columns></desc-columns>
-      </index>
-      <index id="62" parent="6" name="endCityId">
-        <columns>endCityId</columns>
-        <desc-columns></desc-columns>
-      </index>
-      <index id="63" parent="6" name="uid">
+      <index id="59" parent="6" name="uid">
         <columns>uid</columns>
         <desc-columns></desc-columns>
         <unique>1</unique>
       </index>
-      <index id="64" parent="6" name="vehicleId">
-        <columns>vehicleId</columns>
-        <desc-columns></desc-columns>
-      </index>
-      <key id="65" parent="6" name="PRIMARY">
+      <key id="60" parent="6" name="PRIMARY">
         <columns>id</columns>
         <primary>1</primary>
       </key>
-      <key id="66" parent="6" name="uid">
+      <key id="61" parent="6" name="uid">
         <columns>uid</columns>
         <underlying-index>uid</underlying-index>
       </key>
-      <foreign-key id="67" parent="6" name="order1_ibfk_1">
-        <columns>currentCityId</columns>
-        <ref-key>~.city.city</ref-key>
-        <cascade-update-rule>restrict</cascade-update-rule>
-        <cascade-delete-rule>restrict</cascade-delete-rule>
-      </foreign-key>
-      <foreign-key id="68" parent="6" name="order1_ibfk_2">
-        <columns>endCityId</columns>
-        <ref-key>~.city.city</ref-key>
-        <cascade-update-rule>restrict</cascade-update-rule>
-        <cascade-delete-rule>restrict</cascade-delete-rule>
-      </foreign-key>
-      <foreign-key id="69" parent="6" name="order1_ibfk_3">
-        <columns>vehicleId</columns>
-        <ref-key>~.vehicle.PRIMARY</ref-key>
-        <cascade-update-rule>restrict</cascade-update-rule>
-        <cascade-delete-rule>restrict</cascade-delete-rule>
-      </foreign-key>
-      <column id="70" parent="7" name="id">
+      <column id="62" parent="7" name="id">
         <mandatory>1</mandatory>
         <data-type>bigint(20)</data-type>
         <sequence-identity>1</sequence-identity>
       </column>
-      <column id="71" parent="7" name="orderId">
+      <column id="63" parent="7" name="orderId">
         <mandatory>1</mandatory>
         <data-type>bigint(20)</data-type>
       </column>
-      <column id="72" parent="7" name="cityId">
+      <column id="64" parent="7" name="cityId">
         <mandatory>1</mandatory>
         <data-type>bigint(20)</data-type>
       </column>
-      <column id="73" parent="7" name="itemNumber">
+      <column id="65" parent="7" name="itemNumber">
         <mandatory>1</mandatory>
         <data-type>int(11)</data-type>
       </column>
-      <index id="74" parent="7" name="cityId">
+      <index id="66" parent="7" name="cityId">
         <columns>cityId</columns>
         <desc-columns></desc-columns>
       </index>
-      <index id="75" parent="7" name="orderId">
+      <index id="67" parent="7" name="orderId">
         <columns>orderId</columns>
         <desc-columns></desc-columns>
       </index>
-      <key id="76" parent="7" name="PRIMARY">
+      <key id="68" parent="7" name="PRIMARY">
         <columns>id</columns>
         <primary>1</primary>
       </key>
-      <foreign-key id="77" parent="7" name="orderitems_ibfk_1">
+      <foreign-key id="69" parent="7" name="orderitems_ibfk_1">
         <columns>cityId</columns>
         <ref-key>~.city.city</ref-key>
         <cascade-update-rule>restrict</cascade-update-rule>
         <cascade-delete-rule>restrict</cascade-delete-rule>
       </foreign-key>
-      <foreign-key id="78" parent="7" name="orderitems_ibfk_2">
+      <foreign-key id="70" parent="7" name="orderitems_ibfk_2">
         <columns>orderId</columns>
         <ref-key>~.order1.PRIMARY</ref-key>
         <cascade-update-rule>restrict</cascade-update-rule>
         <cascade-delete-rule>restrict</cascade-delete-rule>
       </foreign-key>
-      <column id="79" parent="8" name="id">
+      <column id="71" parent="8" name="id">
         <mandatory>1</mandatory>
         <data-type>bigint(20)</data-type>
         <sequence-identity>1</sequence-identity>
       </column>
-      <column id="80" parent="8" name="vin">
+      <column id="72" parent="8" name="vin">
         <mandatory>1</mandatory>
         <data-type>varchar(7)</data-type>
       </column>
-      <column id="81" parent="8" name="capacity">
+      <column id="73" parent="8" name="capacity">
         <mandatory>1</mandatory>
         <data-type>decimal(3,1)</data-type>
       </column>
-      <column id="82" parent="8" name="nDrivers">
+      <column id="74" parent="8" name="nDrivers">
         <mandatory>1</mandatory>
         <data-type>int(1)</data-type>
       </column>
-      <column id="83" parent="8" name="isAvailable">
+      <column id="75" parent="8" name="isAvailable">
         <mandatory>1</mandatory>
         <data-type>smallint(6)</data-type>
         <default-expression>&apos;1&apos;</default-expression>
       </column>
-      <column id="84" parent="8" name="cityId">
+      <column id="76" parent="8" name="cityId">
         <mandatory>1</mandatory>
         <data-type>bigint(20)</data-type>
       </column>
-      <index id="85" parent="8" name="cityId">
+      <column id="77" parent="8" name="orderId">
+        <data-type>bigint(20)</data-type>
+      </column>
+      <index id="78" parent="8" name="cityId">
         <columns>cityId</columns>
         <desc-columns></desc-columns>
       </index>
-      <index id="86" parent="8" name="vin">
+      <index id="79" parent="8" name="orderId">
+        <columns>orderId</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <index id="80" parent="8" name="vin">
         <columns>vin</columns>
         <desc-columns></desc-columns>
         <unique>1</unique>
       </index>
-      <key id="87" parent="8" name="PRIMARY">
+      <key id="81" parent="8" name="PRIMARY">
         <columns>id</columns>
         <primary>1</primary>
       </key>
-      <key id="88" parent="8" name="vin">
+      <key id="82" parent="8" name="vin">
         <columns>vin</columns>
         <underlying-index>vin</underlying-index>
       </key>
-      <foreign-key id="89" parent="8" name="vehicle_ibfk_1">
+      <foreign-key id="83" parent="8" name="vehicle_ibfk_1">
+        <columns>orderId</columns>
+        <ref-key>~.order1.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <foreign-key id="84" parent="8" name="vehicle_ibfk_2">
         <columns>cityId</columns>
         <ref-key>~.city.city</ref-key>
         <cascade-update-rule>restrict</cascade-update-rule>

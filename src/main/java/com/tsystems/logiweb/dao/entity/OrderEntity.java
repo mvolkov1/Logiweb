@@ -7,7 +7,7 @@ import java.util.Collection;
  * Created by mvolkov on 12.06.2016.
  */
 @Entity
-@Table(name = "order1", schema = "jschool2", catalog = "")
+@Table(name = "order1", schema = "logiweb", catalog = "")
 @Access(AccessType.PROPERTY)
 public class OrderEntity {
     private long id;

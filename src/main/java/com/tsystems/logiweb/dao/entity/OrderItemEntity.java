@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by mvolkov on 12.06.2016.
  */
 @Entity
-@Table(name = "orderitems", schema = "jschool2", catalog = "")
+@Table(name = "orderitems", schema = "logiweb", catalog = "")
 @Access(AccessType.PROPERTY)
 public class OrderItemEntity {
     private long id;

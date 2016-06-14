@@ -1,5 +1,8 @@
 <html>
+<head>
+    <title>Vehicle</title>
+</head>
 <body>
-<h2>Hello Logiweb!</h2>
+<p>Add vehicle</p>
 </body>
 </html>

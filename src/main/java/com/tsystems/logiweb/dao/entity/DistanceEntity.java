@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * Created by mvolkov on 12.06.2016.
  */
 @Entity
-@Table(name = "distance", schema = "jschool2", catalog = "")
+@Table(name = "distance", schema = "logiweb", catalog = "")
 @Access(AccessType.PROPERTY)
 public class DistanceEntity {
 

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  * Created by mvolkov on 12.06.2016.
  */
 @Entity
-@Table(name = "driver", schema = "jschool2", catalog = "")
+@Table(name = "driver", schema = "logiweb", catalog = "")
 @Access(AccessType.PROPERTY)
 public class DriverEntity {
     private long id;

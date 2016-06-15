@@ -2,22 +2,10 @@
 <head>
     <meta charset="utf-8">
     <title>Logiweb</title>
-    <style type="text/css">
-        body {
-            padding-left: 11em;
-            font-family: Georgia, "Times New Roman",
-            Times, serif;
-            color: purple;
-            background-color: #d8da3d }
-        h1 {
-            font-family: Helvetica, Geneva, Arial,
-            SunSans-Regular, sans-serif }
-        ul.navbar {
-            position: absolute;
-            top: 2em;
-            left: 1em;
-            width: 9em }
-    </style>
+    <style> <%@include file="/css/body.css" %> </style>
+    <style> <%@include file="/css/nav.css" %> </style>
+    <style> <%@include file="/css/right.css" %> </style>
+
 </head>
 <body>
 
@@ -28,13 +16,9 @@
     <li><a href="order">Orders</a>
 </ul>
 
-<!-- Main content -->
-<h1>Welcome to Logiweb!</h1>
-
-<p>Java school!
-
-
-
+<div class="right">
+<h1 > Welcome to Logiweb! </h1>
+</div>
 
 </body>
 </html>

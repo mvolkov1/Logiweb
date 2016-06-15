@@ -1,6 +1,8 @@
 package com.tsystems.logiweb.web;
 
+import com.tsystems.logiweb.dao.entity.DriverEntity;
 import com.tsystems.logiweb.dao.entity.VehicleEntity;
+import com.tsystems.logiweb.services.impl.DriverService;
 import com.tsystems.logiweb.services.impl.VehicleService;
 
 import javax.servlet.RequestDispatcher;
@@ -39,27 +41,19 @@ public class ServletFrontController extends HttpServlet {
             }
             else if (path.equals("/Logiweb/vehicle")) {
 
-                VehicleService vehicleService = new VehicleService();
-
-                List<VehicleEntity> vehicles = vehicleService.getListOfVehicles();
-                String vin = null;
-                for (VehicleEntity vehicleEntity : vehicles)
-                {
-                    vin = vehicleEntity.getVin();
-                }
-
-
-                request.setAttribute("vin",vin);
+                List<VehicleEntity> vehicles = new VehicleService().getListOfVehicles();
                 request.setAttribute("list", vehicles);
-
                 request.getRequestDispatcher("/vehicle.jsp").forward(request,response);
-
-            //    RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/vehicle.jsp");
-             //   dispatcher.forward(request,response);
             }
             else if (path.equals("/Logiweb/driver")){
-                RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/driver.jsp");
-                dispatcher.forward(request,response);
+                List<DriverEntity> drivers = new DriverService().getListOfDrivers();
+                request.setAttribute("list", drivers);
+                request.getRequestDispatcher("/driver.jsp").forward(request,response);
+            }
+            else if (path.equals("/Logiweb/order")){
+//                List<DriverEntity> drivers = new DriverService().getListOfDrivers();
+//                request.setAttribute("list", drivers);
+                request.getRequestDispatcher("/order.jsp").forward(request,response);
             }
             else {
                 PrintWriter out = null;

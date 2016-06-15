@@ -1,50 +1,45 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
-    <title>Vehicle</title>
-
-    <style>
-        table {
-            width: 100%;
-        }
-        td {
-            border: 1px solid #000;
-            padding: 4px;
-        }
-    </style>
-    <style type="text/css">
-        body {
-            font-family: Georgia, "Times New Roman",
-            Times, serif;
-            color: purple;
-            background-color: #d8da3d }
-        h1 {
-            font-family: Helvetica, Geneva, Arial,
-            SunSans-Regular, sans-serif }
-    </style>
-
+    <title>Vehicles</title>
+    <style> <%@include file="/css/body.css" %> </style>
+    <style> <%@include file="/css/resultTable.css" %> </style>
+    <style> <%@include file="/css/nav.css" %> </style>
+    <style> <%@include file="/css/right.css" %> </style>
 </head>
 <body>
-<%--<c:forEach var="vehicle" items="${ListOfVehicles}">--%>
-    <%--<tr><td>${vehicle.vin}<td><td>${vehicle.vin}</td></tr>--%>
-<%--</c:forEach>--%>
-<%--<%String name = (String)request.getAttribute("vin"); %>--%>
-<%--<%= name%>--%>
 
-<%--<c:out value='${vin}' />--%>
+<!-- Site navigation menu -->
+<ul class="navbar">
+    <li><a href="http://localhost:8080/Logiweb/vehicle" class="active">Vehicles</a></li>
+    <li><a href="http://localhost:8080/Logiweb/driver">Drivers</a></li>
+    <li><a href="http://localhost:8080/Logiweb/order">Orders</a></li>
+</ul>
 
-<table>
-    <caption>Available vehicles</caption>
-    <th>VIN</th> <th>Capacity</th> <th>Number of drivers</th><th></th>
-    <c:forEach var="vehicle" items="${list}">
-        <tr>
-            <td> ${vehicle.vin} </td>
-            <td> ${vehicle.capacity} </td>
-            <td> ${vehicle.numberOfDrivers} </td>
-        </tr>
-    </c:forEach>
-</table>
+<div class="right">
+    <table>
+        <caption><h1>Available vehicles</h1></caption>
+        <th>VIN</th>
+        <th>Capacity</th>
+        <th>Number of drivers</th>
+        <th>City</th>
+        <th>Order ID</th>
+        <c:forEach var="vehicle" items="${list}">
+            <tr>
+                <td> ${vehicle.vin} </td>
+                <td> ${vehicle.capacity} </td>
+                <td> ${vehicle.numberOfDrivers} </td>
+                <td> ${vehicle.city.city} </td>
+                <td> ${vehicle.order.uid} </td>
+            </tr>
+        </c:forEach>
+    </table>
 
-<p>Add vehicle</p>
+    <form>
+        <input type="submit" value="Add vehicle">
+    </form>
+
+</div>
+
 </body>
 </html>

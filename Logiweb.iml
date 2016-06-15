@@ -56,5 +56,6 @@
     <orderEntry type="library" name="Maven: org.hibernate.common:hibernate-commons-annotations:tests:4.0.1.Final" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-entitymanager:4.0.1.Final" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.10" level="project" />
+    <orderEntry type="library" name="Maven: javax.servlet:jstl:1.2" level="project" />
   </component>
 </module>

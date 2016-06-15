@@ -4,4 +4,12 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+    <servlet-name>ServletFrontController</servlet-name>
+    <servlet-class>com.tsystems.logiweb.web.ServletFrontController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ServletFrontController</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
 </web-app>

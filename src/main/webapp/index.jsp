@@ -23,9 +23,9 @@
 
 <!-- Site navigation menu -->
 <ul class="navbar">
-    <li><a href="vehicle.jsp">Vehicles</a>
-    <li><a href="driver.jsp">Drivers</a>
-    <li><a href="order.jsp">Orders</a>
+    <li><a href="http://localhost:8080/Logiweb/vehicle">Vehicles</a>
+    <li><a href="driver">Drivers</a>
+    <li><a href="order">Orders</a>
 </ul>
 
 <!-- Main content -->

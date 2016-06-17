@@ -1,15 +1,7 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: mvolkov
-  Date: 17.06.2016
-  Time: 13:01
-  To change this template use File | Settings | File Templates.
---%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Order</title>
+    <title>Orders</title>
     <style> <%@include file="/css/body.css" %> </style>
     <style> <%@include file="/css/resultTable.css" %> </style>
     <style> <%@include file="/css/nav.css" %> </style>
@@ -23,24 +15,25 @@
     <li><a href="http://localhost:8080/Logiweb/orders" class="active">Orders</a></li>
 </ul>
 
+
 <div class="right">
     <table class="resultTable">
-        <caption><h1>Order # <c:out value="${orderId}"></c:out></h1></caption>
-        <th>Order item</th>
-        <th>City</th>
-        <%--<th>Cargo to load</th>--%>
-        <%--<th>Cargo to deliver</th>--%>
-        <c:forEach var="item" items="${list}">
+        <caption><h1>Orders</h1></caption>
+        <th>ID</th>
+        <th>Number of items</th>
+        <th>Last name</th>
+        <c:forEach var="order" items="${list}">
             <tr>
-                <td> ${item.itemNumber} </td>
-                <td> ${item.city.city} </td>
+                <td> <a href="http://localhost:8080/Logiweb/order?orderId=${order.uid}" class="tableRef"> ${order.uid}</a>  </td>
+                <td> ${order.numberOfItems} </td>
+                <td> ${order.isCompleted} </td>
             </tr>
         </c:forEach>
     </table>
 
-    <%--<form>--%>
-        <%--<input type="submit" value="Add order">--%>
-    <%--</form>--%>
+    <form>
+        <input type="submit" value="Add order">
+    </form>
 
 </div>
 

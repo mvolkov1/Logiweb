@@ -8,11 +8,8 @@ import java.util.List;
 /**
  * Created by mvolkov on 13.06.2016.
  */
-public interface VehicleDao {
-    public void save(VehicleEntity vehicleEntity);
+public interface VehicleDao extends BaseDao<VehicleEntity>{
     public VehicleEntity findByVin(String name);
-    public List<VehicleEntity> getAllVehicles();
-    public int getNumberOfVehicles();
     public void setAvailable(VehicleEntity vehicle, boolean isAvailable);
     public void setCity(VehicleEntity vehicle, String city);
     public void setOrder(VehicleEntity vehicle, OrderEntity order);

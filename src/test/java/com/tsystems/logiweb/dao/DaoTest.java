@@ -85,11 +85,11 @@ public class DaoTest {
 
     public void createDistance() throws Exception{
 
-        Iterator it1 = cityDao.getAllCities().iterator();
+        Iterator it1 = cityDao.getAllEntities(CityEntity.class).iterator();
         while(it1.hasNext())
         {
             CityEntity city1 = (CityEntity) it1.next();
-            Iterator it2 = cityDao.getAllCities().iterator();
+            Iterator it2 = cityDao.getAllEntities(CityEntity.class).iterator();
             while(it2.hasNext())
             {
                 CityEntity city2 = (CityEntity) it2.next();
@@ -116,7 +116,7 @@ public class DaoTest {
 
     public void createVehicles() {
 
-        Iterator it = cityDao.getAllCities().iterator();
+        Iterator it = cityDao.getAllEntities(CityEntity.class).iterator();
         int i = 0;
         boolean cityHasTwoVehicles = false;
         while(it.hasNext())
@@ -161,7 +161,7 @@ public class DaoTest {
 
     public void checkVehicles()
     {
-        List<CityEntity> cities = cityDao.getAllCities();
+        List<CityEntity> cities = cityDao.getAllEntities(CityEntity.class);
         Iterator it = cities.iterator();
         int i = 0;
         boolean cityHasTwoVehicles = false;
@@ -183,7 +183,7 @@ public class DaoTest {
 
     public void createDrivers()
     {
-        Iterator it = cityDao.getAllCities().iterator();
+        Iterator it = cityDao.getAllEntities(CityEntity.class).iterator();
         int i = 0;
         boolean cityHasTwoVehicles = false;
         while(it.hasNext())
@@ -260,7 +260,7 @@ public class DaoTest {
         cargoDao.save(cargo2);
         cargoDao.save(cargo3);
 
-        List<VehicleEntity> vehicles = vehicleDao.getAllVehicles();
+        List<VehicleEntity> vehicles = vehicleDao.getAllEntities(VehicleEntity.class);
         Iterator<VehicleEntity> it = vehicles.iterator();
         while (it.hasNext())
         {

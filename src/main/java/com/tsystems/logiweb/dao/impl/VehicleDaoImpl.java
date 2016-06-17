@@ -5,17 +5,14 @@ import com.tsystems.logiweb.dao.entity.OrderEntity;
 import com.tsystems.logiweb.dao.entity.VehicleEntity;
 
 import javax.persistence.Query;
-import java.util.List;
 
 
 /**
  * Created by mvolkov on 27.05.2016.
  */
-public class VehicleDaoImpl extends BaseDao implements VehicleDao {
+public class VehicleDaoImpl extends BaseDaoImpl<VehicleEntity> implements VehicleDao {
 
-    public void save(VehicleEntity vehicle) {
-        super.save(vehicle);
-    }
+
 
     public VehicleEntity findById(String id) {
         return em.find(VehicleEntity.class, id);
@@ -30,15 +27,6 @@ public class VehicleDaoImpl extends BaseDao implements VehicleDao {
         return (VehicleEntity) query.getSingleResult();
     }
 
-    public List<VehicleEntity> getAllVehicles() {
-        Query query = em.createQuery("select object(v) from VehicleEntity v");
-        return (List<VehicleEntity>) query.getResultList();
-    }
-
-    public int getNumberOfVehicles() {
-        Query query = em.createQuery("SELECT COUNT (*) FROM VehicleEntity");
-        return (Integer) query.getSingleResult();
-    }
 
     public void setAvailable(VehicleEntity vehicle, boolean isAvailable) {
         Query query = em.createQuery("update VehicleEntity v set v.isAvailable = :b where v.id = :id");

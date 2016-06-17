@@ -5,6 +5,6 @@ import com.tsystems.logiweb.dao.entity.OrderEntity;
 /**
  * Created by mvolkov on 13.06.2016.
  */
-public interface OrderDao {
-    public void save(OrderEntity orderEntity);
+public interface OrderDao extends BaseDao<OrderEntity> {
+    public OrderEntity findByOrderId(String orderId);
 }

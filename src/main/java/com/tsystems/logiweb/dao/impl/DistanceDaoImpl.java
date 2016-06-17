@@ -8,13 +8,13 @@ import javax.persistence.*;
 /**
  * Created by mvolkov on 13.06.2016.
  */
-public class DistanceDaoImpl extends  BaseDao implements DistanceDao{
+public class DistanceDaoImpl extends BaseDaoImpl<DistanceEntity> implements DistanceDao{
 
 
 
-    public void save(DistanceEntity distanceEntity) {
-        super.save(distanceEntity);
-    }
+//    public void save(DistanceEntity distanceEntity) {
+//        super.save(distanceEntity);
+//    }
 
     public DistanceEntity findById(long id) {
         return em.find(DistanceEntity.class, id);

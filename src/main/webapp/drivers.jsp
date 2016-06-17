@@ -11,13 +11,13 @@
 
 <!-- Site navigation menu -->
 <ul class="navbar">
-    <li><a href="http://localhost:8080/Logiweb/vehicle">Vehicles</a></li>
-    <li><a href="http://localhost:8080/Logiweb/driver" class="active">Drivers</a></li>
-    <li><a href="http://localhost:8080/Logiweb/order">Orders</a></li>
+    <li><a href="http://localhost:8080/Logiweb/vehicles">Vehicles</a></li>
+    <li><a href="http://localhost:8080/Logiweb/drivers" class="active">Drivers</a></li>
+    <li><a href="http://localhost:8080/Logiweb/orders">Orders</a></li>
 </ul>
 
 <div class="right">
-    <table>
+    <table class="resultTable">
         <caption><h1>Drivers</h1></caption>
         <th>ID</th>
         <th>First name</th>

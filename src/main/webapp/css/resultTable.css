@@ -1,8 +1,20 @@
-table {
+table.resultTable {
     width: 100%;
 }
 
-td {
+table.resultTable td {
     border: 1px solid #000;
     padding: 4px;
+}
+
+table.resultTable a{
+    display: block;
+    color: #000;
+    text-decoration: none;
+}
+
+
+table.resultTable a:hover {
+    background-color: #555;
+    color: white;
 }

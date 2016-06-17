@@ -1,5 +1,6 @@
 package com.tsystems.logiweb.services.impl;
 
+import com.tsystems.logiweb.dao.api.DriverDao;
 import com.tsystems.logiweb.dao.entity.DriverEntity;
 import com.tsystems.logiweb.dao.impl.DriverDaoImpl;
 
@@ -10,13 +11,13 @@ import java.util.List;
  */
 public class DriverService {
 
-    private DriverDaoImpl driverDao = new DriverDaoImpl();
+    private DriverDao driverDao = new DriverDaoImpl();
 
     public void addVehicle(DriverEntity driverEntity) {
         driverDao.save(driverEntity);
     }
 
     public List<DriverEntity> getListOfDrivers(){
-        return driverDao.getAllDrivers();
+        return driverDao.getAllEntities(DriverEntity.class);
     }
 }

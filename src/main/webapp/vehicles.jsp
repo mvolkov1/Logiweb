@@ -11,13 +11,13 @@
 
 <!-- Site navigation menu -->
 <ul class="navbar">
-    <li><a href="http://localhost:8080/Logiweb/vehicle" class="active">Vehicles</a></li>
-    <li><a href="http://localhost:8080/Logiweb/driver">Drivers</a></li>
-    <li><a href="http://localhost:8080/Logiweb/order">Orders</a></li>
+    <li><a href="http://localhost:8080/Logiweb/vehicles" class="active">Vehicles</a></li>
+    <li><a href="http://localhost:8080/Logiweb/drivers">Drivers</a></li>
+    <li><a href="http://localhost:8080/Logiweb/orders">Orders</a></li>
 </ul>
 
 <div class="right">
-    <table>
+    <table class="resultTable">
         <caption><h1>Available vehicles</h1></caption>
         <th>VIN</th>
         <th>Capacity</th>
@@ -30,13 +30,13 @@
                 <td> ${vehicle.capacity} </td>
                 <td> ${vehicle.numberOfDrivers} </td>
                 <td> ${vehicle.city.city} </td>
-                <td> ${vehicle.order.uid} </td>
+                <td> <a href="http://localhost:8080/Logiweb/order?orderId=${vehicle.order.uid}" > ${vehicle.order.uid}</a> </td>
             </tr>
         </c:forEach>
     </table>
 
     <form>
-        <input type="submit" value="Add vehicle">
+        <input type="submit" value="Add vehicle" >
     </form>
 
 </div>

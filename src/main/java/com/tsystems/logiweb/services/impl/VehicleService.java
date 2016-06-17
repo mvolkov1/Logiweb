@@ -1,5 +1,6 @@
 package com.tsystems.logiweb.services.impl;
 
+import com.tsystems.logiweb.dao.api.VehicleDao;
 import com.tsystems.logiweb.dao.entity.VehicleEntity;
 import com.tsystems.logiweb.dao.impl.VehicleDaoImpl;
 
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public class VehicleService {
 
-    private VehicleDaoImpl vehicleDao = new VehicleDaoImpl();
+    private VehicleDao vehicleDao = new VehicleDaoImpl();
 
     public void addVehicle(VehicleEntity vehicle) {
         vehicleDao.save(vehicle);
@@ -18,7 +19,7 @@ public class VehicleService {
 
 
     public List<VehicleEntity> getListOfVehicles(){
-        return vehicleDao.getAllVehicles();
+        return vehicleDao.getAllEntities(VehicleEntity.class);
     }
 
 }

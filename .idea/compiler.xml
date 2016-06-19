@@ -25,8 +25,8 @@
         <module name="Logiweb" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="Logiweb" target="1.5" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="Logiweb" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -7,4 +7,6 @@ import com.tsystems.logiweb.dao.entity.OrderEntity;
  */
 public interface OrderDao extends BaseDao<OrderEntity> {
     public OrderEntity findByOrderId(String orderId);
+    public void updateOrder(OrderEntity orderEntity, String uid, String numberOfItems, String isCompleted);
+
 }

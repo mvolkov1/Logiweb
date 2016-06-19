@@ -1,5 +1,6 @@
 package com.tsystems.logiweb.dao.api;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 /**
@@ -10,4 +11,5 @@ public interface BaseDao<T> {
     public void save(T t);
     public List<T> getAllEntities(Class c);
     public int getNumberOfEntities(Class c);
+    public void setEntityManager(EntityManager entityManager);
 }

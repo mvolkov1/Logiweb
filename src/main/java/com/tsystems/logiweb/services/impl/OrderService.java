@@ -1,5 +1,6 @@
 package com.tsystems.logiweb.services.impl;
 
+import com.tsystems.logiweb.dao.TransactionManager;
 import com.tsystems.logiweb.dao.api.OrderDao;
 import com.tsystems.logiweb.dao.entity.OrderEntity;
 import com.tsystems.logiweb.dao.impl.OrderDaoImpl;
@@ -11,9 +12,59 @@ import java.util.List;
  */
 public class OrderService {
 
-    private OrderDao orderDao = new OrderDaoImpl();
+    private TransactionManager transactionManager = TransactionManager.getInstance();
+    private OrderDao orderDao = new OrderDaoImpl(transactionManager.getEntityManager());
 
-    public List<OrderEntity> getListOfOrders(){
+
+    public synchronized  List<OrderEntity> getListOfOrders(){
         return orderDao.getAllEntities(OrderEntity.class);
+    }
+
+    public void addOrder(String uid, int numberOfItems)
+    {
+        try {
+            transactionManager.beginTransaction();
+            try {
+                OrderEntity orderEntity = new OrderEntity();
+                orderEntity.setNumberOfItems(numberOfItems);
+                orderEntity.setIsCompleted((short)0);
+                orderEntity.setUid(uid);
+                orderDao.save(orderEntity);
+                transactionManager.commitTransaction();
+            }
+            catch (Exception e)
+            {
+                transactionManager.rollbackTransaction();
+            }
+        }
+        catch (Exception e)
+        {}
+    }
+
+    public synchronized OrderEntity getOrderByUid(String uid){
+        return orderDao.findByOrderId(uid);
+    }
+
+    public synchronized void updateOrder(OrderEntity orderEntity, String uid, String numberOfItems,
+                                         String isCompleted)
+    {
+        try {
+            transactionManager.beginTransaction();
+            try{
+                orderDao.updateOrder(orderEntity, uid, numberOfItems, isCompleted);
+                transactionManager.commitTransaction();
+
+            } catch (Exception e) {
+
+                transactionManager.rollbackTransaction();
+                //TODO   throw new LogiwebServiceException("", e);
+            } finally {
+//                transactionManager.close();
+            }
+        }
+        catch (Exception e)
+        {
+            // TODO throw new TransactionManagerException("",e)
+        }
     }
 }

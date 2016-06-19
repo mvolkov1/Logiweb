@@ -1,7 +1,9 @@
 package com.tsystems.logiweb.dao.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by mvolkov on 12.06.2016.
@@ -16,9 +18,9 @@ public class OrderEntity {
     private int numberOfItems;
 
     private VehicleEntity vehicle;
-    private Collection<OrderItemEntity> orderItems;
-    private Collection<CargoEntity> cargos;
-    private Collection<DriverEntity> drivers;
+    private Collection<OrderItemEntity> orderItems = new ArrayList<>();
+    private Collection<CargoEntity> cargos = new ArrayList<>();
+    private Collection<DriverEntity> drivers = new ArrayList<>();
 
 
     public OrderEntity(){super();}

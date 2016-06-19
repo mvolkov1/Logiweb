@@ -1,6 +1,7 @@
 package com.tsystems.logiweb.dao.impl;
 
 
+import com.tsystems.logiweb.dao.TransactionManager;
 import com.tsystems.logiweb.dao.api.BaseDao;
 
 import javax.persistence.*;
@@ -9,33 +10,43 @@ import java.util.List;
 /**
  * Created by mvolkov on 13.06.2016.
  */
-public class BaseDaoImpl<T> implements BaseDao<T> {
+public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 
-    protected EntityManagerFactory emf = Persistence.createEntityManagerFactory("logiweb");
-    protected EntityManager em = emf.createEntityManager();
-    protected EntityTransaction tr = em.getTransaction();
+
+    protected EntityManager entityManager;
+
+    public BaseDaoImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+
+
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     public void save(T object) {
-        try {
-            tr.begin();
-            em.persist(object);
-            tr.commit();
-        } finally {
-            if (tr.isActive()) {
-                tr.rollback();
-            }
-        }
+        entityManager.persist(object);
     }
 
 
     public List<T> getAllEntities(Class c) {
         String stringQuery = "select object(o) from " + c.getSimpleName() + " o";
-        Query query = em.createQuery("select object(o) from " + c.getSimpleName() + " o");
-        return (List<T>) query.getResultList();
+        Query query = entityManager.createQuery("select object(o) from " + c.getSimpleName() + " o");
+        List<T> ret = null;
+        try
+        {
+            ret = (List<T>) query.getResultList();
+        }
+        catch (Exception e)
+        {
+            ret = null;
+        }
+        return ret;
     }
 
     public int getNumberOfEntities(Class c) {
-        Query query = em.createQuery("select count (*) from " + c.getSimpleName());
+        Query query = entityManager.createQuery("select count (*) from " + c.getSimpleName());
         return (Integer) query.getSingleResult();
     }
 }

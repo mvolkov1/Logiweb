@@ -10,19 +10,31 @@ import javax.persistence.*;
  */
 public class CityDaoImpl extends BaseDaoImpl<CityEntity> implements CityDao {
 
-
+    public CityDaoImpl(EntityManager entityManager)
+    {
+        super(entityManager);
+    }
 
     public CityEntity findById(long id) {
-        return em.find(CityEntity.class, id);
+        return entityManager.find(CityEntity.class, id);
     }
 
     public CityEntity findByName(String name) {
 
-        Query query = em.createQuery(
+        Query query = entityManager.createQuery(
                 "select object(c) from CityEntity c where c.city = :name"
         );
         query.setParameter("name", name);
-        return (CityEntity) query.getSingleResult();
+        CityEntity cityEntity = null;
+        try
+        {
+            cityEntity = (CityEntity) query.getSingleResult();
+        }
+        catch (Exception e)
+        {
+            cityEntity = null;
+        }
+        return cityEntity;
     }
 
 

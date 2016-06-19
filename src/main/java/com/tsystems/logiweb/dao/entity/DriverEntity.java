@@ -12,12 +12,12 @@ import java.math.BigDecimal;
 public class DriverEntity {
     private long id;
     private String uid;
-    private String firstName;
-    private String lastName;
+    private UserEntity user;
     private int monthHours;
     private String status;
     private OrderEntity order;
     private CityEntity city;
+
 
     @Id@GeneratedValue
     @Column(name = "id", nullable = false)
@@ -37,26 +37,6 @@ public class DriverEntity {
 
     public void setUid(String uid) {
         this.uid = uid;
-    }
-
-    @Basic
-    @Column(name = "firstName", nullable = false, length = 50)
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    @Basic
-    @Column(name = "lastName", nullable = false, length = 50)
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     @Basic
@@ -97,5 +77,16 @@ public class DriverEntity {
 
     public void setCity(CityEntity city) {
         this.city = city;
+    }
+
+
+    @OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId", referencedColumnName = "id", nullable = false)
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 }

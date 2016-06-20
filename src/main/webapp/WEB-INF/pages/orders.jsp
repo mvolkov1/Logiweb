@@ -39,7 +39,8 @@
 
     <form>
         <input type="submit" value="Add order">
-        <input type="hidden" name="addOrder" value="true">
+        <input type="hidden" name="editOrder" value="true">
+        <input type="hidden" name="emptyOrder" value="true">
     </form>
 
 </div>

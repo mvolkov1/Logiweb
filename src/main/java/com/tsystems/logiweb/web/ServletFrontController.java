@@ -103,56 +103,128 @@ public class ServletFrontController extends HttpServlet {
         OrderService orderService = new OrderService();
         OrderItemService orderItemService = new OrderItemService();
 
-        String addOrder = request.getParameter("addOrder");
-        String uid = request.getParameter("orderUid");
+        String editOrder = request.getParameter("editOrder");
+        String uid = request.getParameter("uid");
+        String saveId = request.getParameter("saveId");
+        String emptyOrder = request.getParameter("emptyOrder");
+        boolean isEmpty = emptyOrder != null && emptyOrder.equals("true");
+        String saveOrderItem =  request.getParameter("saveOrderItem");
 
-        if (addOrder != null && addOrder.equals("true"))
-        {
-            List<OrderItemEntity> items = null;
-            if (uid != null)
-            {
-                String city = request.getParameter("newCity");
+        if (editOrder != null && editOrder.equals("true")) {
+
+            if (!isEmpty) {
+
+                List<OrderItemEntity> items = null;
+                List<VehicleEntity> vehicles = null;
+                List<CargoEntity> cargos = null;
+                VehicleEntity vehicle = null;
+                List<DriverEntity> drivers = null;
+                List<CityEntity> cities = new CityService().getListOfCities();
 
                 OrderEntity orderEntity = orderService.getOrderByUid(uid);
-                int nItems = 0;
-                if (orderEntity != null)
-                {
-                    nItems = orderEntity.getNumberOfItems();
+                if (saveId != null && saveId.equals("true")) {
+                    if (orderEntity == null) {
+                        orderEntity = new OrderEntity();
+                        orderEntity.setNumberOfItems(0);
+                        orderEntity.setUid(uid);
+                        orderEntity.setIsCompleted((short) 0);
+                        orderService.save(orderEntity);
+                    }
                 }
-                else
+
+
+
+                if (saveOrderItem != null && saveOrderItem.equals("true"))
                 {
-                    orderEntity = new OrderEntity();
-                    orderEntity.setNumberOfItems(0);
-                    orderEntity.setUid(uid);
-                    orderEntity.setIsCompleted((short)0);
-                    orderService.save(orderEntity);
-                   // orderService.refresh(orderEntity);
+                    String newCity = request.getParameter("newCity");
+                    OrderItemEntity item = new OrderItemEntity();
+                    item.setCity(new CityService().getCityByName(newCity));
+                    item.setOrder(orderEntity);
+                    int nItems = orderEntity.getNumberOfItems();
+                    nItems++;
+                    item.setItemNumber(nItems);
+                    orderEntity.getOrderItems().add(item);
+                    orderEntity.setNumberOfItems(nItems);
+                    orderItemService.addItem(orderEntity, nItems, new CityService().getCityByName(newCity));
+                    orderService.updateOrder(orderEntity, uid, Integer.toString(nItems), "0");
                 }
-                nItems++;
-                orderEntity.setNumberOfItems(nItems);
-                OrderItemEntity item = new OrderItemEntity();
-                item.setCity(new CityService().getCityByName(city));
-                item.setOrder(orderEntity);
-                item.setItemNumber(nItems);
-                orderEntity.getOrderItems().add(item);
-                orderItemService.addItem(orderEntity, nItems, new CityService().getCityByName(city));
-                orderService.updateOrder(orderEntity, uid, Integer.toString(nItems), "0");
-                items = orderItemService.getListOfItems(uid);
+
+                items = (List<OrderItemEntity>) orderEntity.getOrderItems();
+                cargos = (List<CargoEntity>) orderEntity.getCargos();
+                vehicle = orderEntity.getVehicle();
+                drivers = (List<DriverEntity>) orderEntity.getDrivers();
+                vehicles = new VehicleService().getListOfVehicles();
+
+
+                request.setAttribute("items", items);
+                request.setAttribute("cargos", cargos);
+                request.setAttribute("vehicle", vehicle);
+                request.setAttribute("vehicles", vehicles);
+                request.setAttribute("drivers", drivers);
+                request.setAttribute("cities", cities);
+                request.setAttribute("uid", uid);
 
             }
-
-
-            List<CityEntity> cities = new CityService().getListOfCities();
-            request.setAttribute("items", items);
-            request.setAttribute("cities", cities);
-            request.setAttribute("uid", uid);
             request.getRequestDispatcher("/WEB-INF/pages/newOrder.jsp").forward(request, response);
         }
+//            List<OrderItemEntity> items = null;
+//            List<VehicleEntity> vehicles = null;
+//            short capacity = 0;
+//            if (uid != null)
+//            {
+//                String city = request.getParameter("newCity");
+//
+//                OrderEntity orderEntity = orderService.getOrderByUid(uid);
+//                int nItems = 0;
+//                if (orderEntity != null)
+//                {
+//                    nItems = orderEntity.getNumberOfItems();
+//                }
+//                else
+//                {
+//                    orderEntity = new OrderEntity();
+//                    orderEntity.setNumberOfItems(0);
+//                    orderEntity.setUid(uid);
+//                    orderEntity.setIsCompleted((short)0);
+//                    orderService.save(orderEntity);
+//                   // orderService.refresh(orderEntity);
+//                }
+//                nItems++;
+//                orderEntity.setNumberOfItems(nItems);
+//                OrderItemEntity item = new OrderItemEntity();
+//                item.setCity(new CityService().getCityByName(city));
+//                item.setOrder(orderEntity);
+//                item.setItemNumber(nItems);
+//                orderEntity.getOrderItems().add(item);
+//                orderItemService.addItem(orderEntity, nItems, new CityService().getCityByName(city));
+//                orderService.updateOrder(orderEntity, uid, Integer.toString(nItems), "0");
+//                items = orderItemService.getListOfItems(uid);
+//            }
+//            else
+//            {}
+//            //   vehicles = new VehicleService().getListOfVehiclesForOrder(items.get(0).getCity().getCity(), capacity);
+//            vehicles = new VehicleService().getListOfVehicles();
+//
+//
+//
+//
+//
+//            List<CityEntity> cities = new CityService().getListOfCities();
+//
+//            List<DriverEntity> drivers = new DriverService().getListOfDrivers();
+//            request.setAttribute("items", items);
+//            request.setAttribute("cities", cities);
+//            request.setAttribute("vehicles", vehicles);
+//            request.setAttribute("drivers", drivers);
+//            request.setAttribute("uid", uid);
+//            request.getRequestDispatcher("/WEB-INF/pages/newOrder.jsp").forward(request, response);
+//        }
         else {
             List<OrderEntity> orders = new OrderService().getListOfOrders();
             request.setAttribute("list", orders);
             request.getRequestDispatcher("/WEB-INF/pages/orders.jsp").forward(request, response);
         }
+
 
     }
 

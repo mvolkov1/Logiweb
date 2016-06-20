@@ -25,6 +25,10 @@ public class VehicleService {
         return vehicleDao.getAllEntities(VehicleEntity.class);
     }
 
+    public synchronized  List<VehicleEntity> getListOfVehiclesForOrder(String startCity, short capacity) {
+        return vehicleDao.getListOfVehiclesForOrder(startCity, capacity);
+    }
+
 
     public synchronized VehicleEntity getVehicleByVin(String vin){
         return vehicleDao.findByVin(vin);

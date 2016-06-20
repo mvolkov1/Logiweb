@@ -43,7 +43,19 @@ public class OrderService {
 
     public void save(OrderEntity item)
     {
-        orderDao.save(item);
+        try {
+            transactionManager.beginTransaction();
+            try {
+                orderDao.save(item);
+                transactionManager.commitTransaction();
+            }
+            catch (Exception e)
+            {
+                transactionManager.rollbackTransaction();
+            }
+        }
+        catch (Exception e)
+        {}
     }
 
     public void refresh(OrderEntity orderEntity)

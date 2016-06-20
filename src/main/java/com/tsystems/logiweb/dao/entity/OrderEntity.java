@@ -15,7 +15,7 @@ public class OrderEntity {
     private long id;
     private String uid;
     private short isCompleted;
-    private int numberOfItems;
+    private int numberOfItems=0;
 
     private VehicleEntity vehicle;
     private Collection<OrderItemEntity> orderItems = new ArrayList<>();

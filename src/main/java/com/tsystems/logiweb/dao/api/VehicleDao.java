@@ -18,4 +18,6 @@ public interface VehicleDao extends BaseDao<VehicleEntity>{
 
     public void updateVehicle(VehicleEntity vehicle, String vin, String capacity, String numberOfDrivers, String isAvailable,
                               CityEntity city, OrderEntity order);
+
+    public  List<VehicleEntity> getListOfVehiclesForOrder(String startCity, short capacity);
 }

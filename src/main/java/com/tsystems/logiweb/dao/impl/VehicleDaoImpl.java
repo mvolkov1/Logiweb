@@ -9,6 +9,7 @@ import com.tsystems.logiweb.dao.entity.VehicleEntity;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
+import java.util.List;
 
 
 /**
@@ -117,6 +118,23 @@ public class VehicleDaoImpl extends BaseDaoImpl<VehicleEntity> implements Vehicl
         {
 
         }
+    }
+
+    public List<VehicleEntity> getListOfVehiclesForOrder(String startCity, short capacity)
+    {
+        List<VehicleEntity> vehicles = null;
+        Query query = entityManager.createQuery("select object(v) from VehicleEntity v where ( v.order = null and v.isAvailable=1 and v.capacity > :capacity) ");
+        query.setParameter("capacity", capacity);
+        try {
+
+            vehicles = (List<VehicleEntity>) query.getResultList();
+        }
+        catch (Exception e)
+        {
+            vehicles = null;
+        }
+
+        return vehicles;
     }
 
 }

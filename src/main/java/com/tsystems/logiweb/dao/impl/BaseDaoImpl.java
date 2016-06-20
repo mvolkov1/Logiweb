@@ -26,7 +26,13 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
     }
 
     public void save(T object) {
-        entityManager.persist(object);
+        try {
+            entityManager.persist(object);
+        }
+        catch (Exception e)
+        {
+            int a = 1;
+        }
     }
 
     public void refresh(T object) {entityManager.refresh(object);}

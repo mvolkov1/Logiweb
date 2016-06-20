@@ -49,7 +49,7 @@
 
     <form onsubmit="return checkUid()">
 
-        <input type="text" name="orderUid" id="orderUid" placeholder="enter UID">
+        <input type="text" name="orderUid" id="orderUid" placeholder="enter UID" value="${uid}">
 
 
         <br>
@@ -60,8 +60,8 @@
             <th>City</th>
             <c:forEach var="item" items="${items}" varStatus="status">
                 <tr>
-                    <td> ${item.index + 1} </td>
-                    <td> ${item.city} </td>
+                    <td> ${status.index + 1} </td>
+                    <td> ${item.city.city} </td>
                 </tr>
             </c:forEach>
         </table>

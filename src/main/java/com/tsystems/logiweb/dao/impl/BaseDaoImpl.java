@@ -29,6 +29,9 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
         entityManager.persist(object);
     }
 
+    public void refresh(T object) {entityManager.refresh(object);}
+
+
 
     public List<T> getAllEntities(Class c) {
         String stringQuery = "select object(o) from " + c.getSimpleName() + " o";

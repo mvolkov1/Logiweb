@@ -117,13 +117,16 @@ public class ServletFrontController extends HttpServlet {
                 int nItems = 0;
                 if (orderEntity != null)
                 {
-                    items = new OrderItemService().getListOfItems(uid);
                     nItems = orderEntity.getNumberOfItems();
                 }
                 else
                 {
                     orderEntity = new OrderEntity();
-                    orderService.addOrder(uid, 0);
+                    orderEntity.setNumberOfItems(0);
+                    orderEntity.setUid(uid);
+                    orderEntity.setIsCompleted((short)0);
+                    orderService.save(orderEntity);
+                   // orderService.refresh(orderEntity);
                 }
                 nItems++;
                 orderEntity.setNumberOfItems(nItems);
@@ -134,6 +137,7 @@ public class ServletFrontController extends HttpServlet {
                 orderEntity.getOrderItems().add(item);
                 orderItemService.addItem(orderEntity, nItems, new CityService().getCityByName(city));
                 orderService.updateOrder(orderEntity, uid, Integer.toString(nItems), "0");
+                items = orderItemService.getListOfItems(uid);
 
             }
 
@@ -141,6 +145,7 @@ public class ServletFrontController extends HttpServlet {
             List<CityEntity> cities = new CityService().getListOfCities();
             request.setAttribute("items", items);
             request.setAttribute("cities", cities);
+            request.setAttribute("uid", uid);
             request.getRequestDispatcher("/WEB-INF/pages/newOrder.jsp").forward(request, response);
         }
         else {

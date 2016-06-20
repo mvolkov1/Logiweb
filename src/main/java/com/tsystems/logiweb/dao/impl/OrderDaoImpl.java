@@ -36,6 +36,9 @@ public class OrderDaoImpl extends BaseDaoImpl<OrderEntity> implements OrderDao{
         return orderEntity;
     }
 
+
+
+
     public void updateOrder(OrderEntity orderEntity, String uid, String numberOfItems, String isCompleted)
     {
         Query query = entityManager.createQuery("update OrderEntity o"

@@ -41,6 +41,16 @@ public class OrderService {
         {}
     }
 
+    public void save(OrderEntity item)
+    {
+        orderDao.save(item);
+    }
+
+    public void refresh(OrderEntity orderEntity)
+    {
+        orderDao.refresh(orderEntity);
+    }
+
     public synchronized OrderEntity getOrderByUid(String uid){
         return orderDao.findByOrderId(uid);
     }

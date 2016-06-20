@@ -9,6 +9,7 @@ import java.util.List;
 public interface BaseDao<T> {
 
     public void save(T t);
+    public void refresh(T t);
     public List<T> getAllEntities(Class c);
     public int getNumberOfEntities(Class c);
     public void setEntityManager(EntityManager entityManager);

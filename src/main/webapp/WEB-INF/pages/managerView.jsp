@@ -24,7 +24,9 @@
 </ul>
 
 <div class="right">
-<h1 > Welcome to Logiweb! </h1>
+    <h3>
+        <c:out value=" You are logged in as ${firstName} ${lastName}"></c:out>
+    </h3>
 </div>
 
 </body>

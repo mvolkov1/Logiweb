@@ -20,4 +20,6 @@ public interface VehicleDao extends BaseDao<VehicleEntity>{
                               CityEntity city, OrderEntity order);
 
     public  List<VehicleEntity> getListOfVehiclesForOrder(String startCity, short capacity);
+
+    public void setOrderForVehicle(VehicleEntity vehicleEntity, OrderEntity orderEntity);
 }

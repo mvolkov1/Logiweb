@@ -18,3 +18,12 @@ table.resultTable a:hover {
     background-color: #555;
     color: white;
 }
+
+table.cargoTable{
+
+}
+
+table.cargoTable td {
+    border: none;
+    padding: 2px;
+}

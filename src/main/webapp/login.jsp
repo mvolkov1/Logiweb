@@ -15,14 +15,20 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <style> <%@include file="WEB-INF/css/right.css" %> </style>
 
     <style> <%@include file="WEB-INF/css/body.css" %> </style>
+    <style> <%@include file="WEB-INF/css/nav.css" %> </style>
 
 
 </head>
 <body>
 
-<div >
+<!-- Site navigation menu -->
+<ul class="navbar">
+</ul>
+
+<div class="right">
     <h1 > Welcome to Logiweb! </h1>
 
     <form id="auth" method="post"></form>

@@ -26,6 +26,30 @@ public class OrderItemService {
         orderItemDao.save(item);
     }
 
+    public void saveCargo(OrderItemEntity orderItemEntity)
+    {
+        try {
+            transactionManager.beginTransaction();
+            try{
+
+                orderItemDao.save(orderItemEntity);
+
+                transactionManager.commitTransaction();
+
+            } catch (Exception e) {
+
+                transactionManager.rollbackTransaction();
+                //TODO   throw new LogiwebServiceException("", e);
+            } finally {
+//                transactionManager.close();
+            }
+        }
+        catch (Exception e)
+        {
+            // TODO throw new TransactionManagerException("",e)
+        }
+    }
+
     public void addItem(OrderEntity orderEntity, int itemNumber, CityEntity cityEntity)
     {
         try {

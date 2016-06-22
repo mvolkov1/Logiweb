@@ -17,7 +17,7 @@
 
     <title>Order</title>
     <style> <%@include file="../css/body.css" %> </style>
-    <style> <%@include file="../css/resultTable.css" %> </style>
+    <style> <%@include file="../css/tables.css" %> </style>
     <style> <%@include file="../css/nav.css" %> </style>
     <style> <%@include file="../css/right.css" %> </style>
 </head>

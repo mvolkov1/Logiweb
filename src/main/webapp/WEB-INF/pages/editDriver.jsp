@@ -10,7 +10,7 @@
 
     <title>Edit driver</title>
     <style> <%@include file="../css/body.css" %> </style>
-    <style> <%@include file="../css/resultTable.css" %> </style>
+    <style> <%@include file="../css/tables.css" %> </style>
     <style> <%@include file="../css/nav.css" %> </style>
     <style> <%@include file="../css/right.css" %> </style>
 
@@ -30,9 +30,9 @@
 
 <div class="right">
 
+    <h2><c:out value="Edit driver: ${firstName} ${lastName}"></c:out></h2>
     <form onsubmit="return validateDriverInput()">
         <table>
-            <caption><h1>Edit driver</h1></caption>
             <tr>
                 <td>UID</td>
                 <td><input type="text" name="uid" id="uid" value="${uid}"></td>
@@ -44,7 +44,7 @@
             <tr>
                 <td>City</td>
                 <td>
-                    <select name="city">
+                    <select name="city" class="edit">
                         <c:forEach var="city1" items="${cities}">
                             <option value="${city1.city}" ${city1.city == driverCity ? 'selected="selected"' : ''}>${city1.city}</option>
                         </c:forEach>
@@ -54,7 +54,7 @@
             <tr>
                 <td>Status</td>
                 <td>
-                    <select name="status1">
+                    <select name="status1" class="edit">
                         <option value="driving" ${status == "driving" ? 'selected="selected"':''}>driving</option>
                         <option value="busy" ${status == "busy" ? 'selected="selected"':''}>busy</option>
                         <option value="free" ${status == "free" ? 'selected="selected"':''}>free</option>

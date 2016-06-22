@@ -120,6 +120,25 @@ public class VehicleDaoImpl extends BaseDaoImpl<VehicleEntity> implements Vehicl
         }
     }
 
+    public void setOrderForVehicle(VehicleEntity vehicleEntity, OrderEntity orderEntity)
+    {
+        Query query = entityManager.createQuery("update VehicleEntity v"
+                + " set v.order = :order "
+                + " where v.id = :id");
+        query.setParameter("id", vehicleEntity.getId());
+        query.setParameter("order", orderEntity);
+
+        int updateCount = 0;
+        try
+        {
+            updateCount = query.executeUpdate();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
     public List<VehicleEntity> getListOfVehiclesForOrder(String startCity, short capacity)
     {
         List<VehicleEntity> vehicles = null;

@@ -1,5 +1,11 @@
 .right{
     margin-left: 15%;
-    padding: 1px 16px;
+    padding: 4px 16px;
 }
+
+
+select.edit {
+     width: 100%;
+ }
+
 

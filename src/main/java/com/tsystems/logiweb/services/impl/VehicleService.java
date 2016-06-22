@@ -90,6 +90,28 @@ public class VehicleService {
         }
     }
 
+    public void setOrderForVehicle(VehicleEntity vehicleEntity, OrderEntity orderEntity)
+    {
+        try {
+            transactionManager.beginTransaction();
+            try{
+                vehicleDao.setOrderForVehicle(vehicleEntity, orderEntity);
+                transactionManager.commitTransaction();
+
+            } catch (Exception e) {
+
+                transactionManager.rollbackTransaction();
+                //TODO   throw new LogiwebServiceException("", e);
+            } finally {
+//                transactionManager.close();
+            }
+        }
+        catch (Exception e)
+        {
+            // TODO throw new TransactionManagerException("",e)
+        }
+    }
+
     public synchronized void deleteVehicle(String vin)
     {
         try {

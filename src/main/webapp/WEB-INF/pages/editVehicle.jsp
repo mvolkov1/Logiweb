@@ -17,7 +17,7 @@
 
     <title>Edit vehicle</title>
     <style> <%@include file="../css/body.css" %> </style>
-    <style> <%@include file="../css/resultTable.css" %> </style>
+    <style> <%@include file="../css/tables.css" %> </style>
     <style> <%@include file="../css/nav.css" %> </style>
     <style> <%@include file="../css/right.css" %> </style>
 
@@ -42,20 +42,20 @@
             <caption><h1>Edit vehicle</h1></caption>
             <tr>
                 <td>VIN</td>
-                <td><input type="text" name="vin" id="vin" value="${vin}"></td>
+                <td><input type="text" name="vin" id="vin" value="${vin}" ></td>
             </tr>
             <tr>
                 <td>Capacity</td>
-                <td><input type="text" name="capacity"  id="capacity" value="${capacity}"></td>
+                <td><input type="text" name="capacity"  id="capacity" value="${capacity}" ></td>
             </tr>
             <tr>
-                <td>Number of drivers</td>
-                <td><input type="text" name="numberOfDrivers" id="numberOfDrivers" value="${numberOfDrivers}"></td>
+                <td >Number of drivers</td>
+                <td><input type="text" name="numberOfDrivers" id="numberOfDrivers" value="${numberOfDrivers}" width="300px"></td>
             </tr>
             <tr>
                 <td>City</td>
                 <td>
-                    <select name="city">
+                    <select name="city" class="edit">
                         <c:forEach var="city1" items="${cities}">
                             <option value="${city1.city}" ${city1.city == vehicleCity ? 'selected="selected"' : ''}>${city1.city}</option>
                         </c:forEach>
@@ -65,7 +65,7 @@
             <tr>
                 <td>Is available?</td>
                 <td>
-                    <select name="isAvailable1">
+                    <select name="isAvailable1" class="edit">
                         <option value="yes" ${isAvailable == "yes" ? 'selected="selected"':''}>yes</option>
                         <option value="no" ${isAvailable == "no" ? 'selected="selected"':''}>no</option>
                     </select>

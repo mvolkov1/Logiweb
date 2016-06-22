@@ -9,10 +9,10 @@
 
     <title>Vehicles</title>
     <style> <%@include file="../css/body.css" %> </style>
-    <style> <%@include file="../css/resultTable.css" %> </style>
+    <style> <%@include file="../css/tables.css" %> </style>
     <style> <%@include file="../css/nav.css" %> </style>
     <style> <%@include file="../css/right.css" %> </style>
-    <style> <%@include file="../css/editOrDelete.css" %> </style>
+    <style> <%@include file="../css/buttons.css" %> </style>
     <script>
         function confirmDelete() {
             return confirm("Delete vehicle?");
@@ -29,7 +29,7 @@
 </ul>
 
 <div class="right">
-    <table class="resultTable" width='100%'>
+    <table class="resultTable">
         <caption><h1>Vehicles</h1></caption>
         <th>VIN</th>
         <th>Capacity</th>
@@ -50,14 +50,14 @@
                 </td>
                 <td align="center">
                     <form>
-                        <input type="submit" value="Edit" class="editOrDelete">
+                        <input type="submit" value="Edit" class="buttonInCell">
                         <input type="hidden" name="editVehicle" value="true">
                         <input type="hidden" name="vin" value=${vehicle.vin}>
                     </form>
                 </td>
                 <td align="center">
                     <form onsubmit="return confirmDelete()">
-                        <input type="submit" value="Delete" class="editOrDelete">
+                        <input type="submit" value="Delete" class="buttonInCell">
                         <input type="hidden" name="deleteVehicle" value="true">
                         <input type="hidden" name="vin" value=${vehicle.vin}>
                     </form>
@@ -70,13 +70,14 @@
     <p>
 
     <form>
-        <input type="submit" value="Add new vehicle"  class="editOrDelete">
+        <input type="submit" value="Add new vehicle"  class="buttonAddToTable">
         <input type="hidden" name="newVehicle" value="true">
     </form>
 
     </p>
 
 </div>
-
+<br>
+<br>
 </body>
 </html>

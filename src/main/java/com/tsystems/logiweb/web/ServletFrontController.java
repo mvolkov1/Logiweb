@@ -9,16 +9,20 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by mvolkov on 15.06.2016.
  */
 public class ServletFrontController extends HttpServlet {
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         StringBuffer servletUrl = request.getRequestURL();
@@ -33,6 +37,8 @@ public class ServletFrontController extends HttpServlet {
                     UserEntity userEntity = new UserService().findUserByLogin(login);
                     if (userEntity != null && userEntity.getPassword().equals(password)) {
                         if (userEntity.getRole().equals("manager")) {
+                            request.setAttribute("lastName", userEntity.getLastName());
+                            request.setAttribute("firstName", userEntity.getFirstName());
                             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/pages/managerView.jsp");
                             dispatcher.forward(request, response);
                         } else if (userEntity.getRole().equals("driver")) {
@@ -47,14 +53,18 @@ public class ServletFrontController extends HttpServlet {
                     RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/login.jsp");
                     dispatcher.forward(request, response);
                 }
+            }else if (path.equals("/Logiweb/newOrder")) {
+                handleNewOrder(request, response);
             }
-
         }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         StringBuffer servletUrl = request.getRequestURL();
+
+        HttpSession session = request.getSession();
+
 
 
         if (servletUrl != null) {
@@ -97,7 +107,7 @@ public class ServletFrontController extends HttpServlet {
 
     }
 
-    private void handleOrdersPage(HttpServletRequest request, HttpServletResponse response)
+    private void handleNewOrder(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         OrderService orderService = new OrderService();
@@ -109,6 +119,9 @@ public class ServletFrontController extends HttpServlet {
         String emptyOrder = request.getParameter("emptyOrder");
         boolean isEmpty = emptyOrder != null && emptyOrder.equals("true");
         String saveOrderItem =  request.getParameter("saveOrderItem");
+        String saveCargo = request.getParameter("saveCargo");
+        String saveVehicle = request.getParameter("saveVehicle");
+        String vin = request.getParameter("vin");
 
         if (editOrder != null && editOrder.equals("true")) {
 
@@ -132,8 +145,6 @@ public class ServletFrontController extends HttpServlet {
                     }
                 }
 
-
-
                 if (saveOrderItem != null && saveOrderItem.equals("true"))
                 {
                     String newCity = request.getParameter("newCity");
@@ -149,11 +160,56 @@ public class ServletFrontController extends HttpServlet {
                     orderService.updateOrder(orderEntity, uid, Integer.toString(nItems), "0");
                 }
 
+                if (saveCargo != null && saveCargo.equals("true"))
+                {
+                    CityService cityService = new CityService();
+                    String cargoId = request.getParameter("cargoId");
+                    String mass = request.getParameter("cargoMass");
+                    String title = request.getParameter("cargoTitle");
+                    String city1 = request.getParameter("cargoCity1");
+                    String city2 = request.getParameter("cargoCity2");
+                    CargoEntity cargo = new CargoEntity();
+                    cargo.setUid(cargoId);
+                    cargo.setTitle(title);
+                    cargo.setMass(new BigDecimal(mass));
+                    cargo.setStartCity(cityService.getCityByName(city1));
+                    cargo.setEndCity(cityService.getCityByName(city2));
+                    cargo.setOrder(orderEntity);
+                    cargo.setStatus("Prepared");
+                    new CargoService().saveCargo(cargo);
+                    orderEntity.getCargos().add(cargo);
+                }
+
+                if (saveVehicle != null && saveVehicle.equals("true"))
+                {
+                    if (vin != null)
+                    {
+                        VehicleService vehicleService = new VehicleService();
+                        vehicle = vehicleService.getVehicleByVin(vin);
+                        vehicle.setOrder(orderEntity);
+                        orderEntity.setVehicle(vehicle);
+                        vehicleService.setOrderForVehicle(vehicle,orderEntity);
+                    }
+
+                }
+
+
+
+                cargos = (List<CargoEntity>) orderEntity.getCargos();
                 items = (List<OrderItemEntity>) orderEntity.getOrderItems();
                 cargos = (List<CargoEntity>) orderEntity.getCargos();
                 vehicle = orderEntity.getVehicle();
                 drivers = (List<DriverEntity>) orderEntity.getDrivers();
                 vehicles = new VehicleService().getListOfVehicles();
+
+                Set<CityEntity> citiesForOrder = new HashSet<CityEntity>();
+                if (items != null)
+                {
+                    for (OrderItemEntity item:items)
+                    {
+                        citiesForOrder.add(item.getCity());
+                    }
+                }
 
 
                 request.setAttribute("items", items);
@@ -162,70 +218,26 @@ public class ServletFrontController extends HttpServlet {
                 request.setAttribute("vehicles", vehicles);
                 request.setAttribute("drivers", drivers);
                 request.setAttribute("cities", cities);
+                request.setAttribute("citiesForOrder", citiesForOrder);
                 request.setAttribute("uid", uid);
-
+                request.setAttribute("vin", vin);
             }
             request.getRequestDispatcher("/WEB-INF/pages/newOrder.jsp").forward(request, response);
         }
-//            List<OrderItemEntity> items = null;
-//            List<VehicleEntity> vehicles = null;
-//            short capacity = 0;
-//            if (uid != null)
-//            {
-//                String city = request.getParameter("newCity");
-//
-//                OrderEntity orderEntity = orderService.getOrderByUid(uid);
-//                int nItems = 0;
-//                if (orderEntity != null)
-//                {
-//                    nItems = orderEntity.getNumberOfItems();
-//                }
-//                else
-//                {
-//                    orderEntity = new OrderEntity();
-//                    orderEntity.setNumberOfItems(0);
-//                    orderEntity.setUid(uid);
-//                    orderEntity.setIsCompleted((short)0);
-//                    orderService.save(orderEntity);
-//                   // orderService.refresh(orderEntity);
-//                }
-//                nItems++;
-//                orderEntity.setNumberOfItems(nItems);
-//                OrderItemEntity item = new OrderItemEntity();
-//                item.setCity(new CityService().getCityByName(city));
-//                item.setOrder(orderEntity);
-//                item.setItemNumber(nItems);
-//                orderEntity.getOrderItems().add(item);
-//                orderItemService.addItem(orderEntity, nItems, new CityService().getCityByName(city));
-//                orderService.updateOrder(orderEntity, uid, Integer.toString(nItems), "0");
-//                items = orderItemService.getListOfItems(uid);
-//            }
-//            else
-//            {}
-//            //   vehicles = new VehicleService().getListOfVehiclesForOrder(items.get(0).getCity().getCity(), capacity);
-//            vehicles = new VehicleService().getListOfVehicles();
-//
-//
-//
-//
-//
-//            List<CityEntity> cities = new CityService().getListOfCities();
-//
-//            List<DriverEntity> drivers = new DriverService().getListOfDrivers();
-//            request.setAttribute("items", items);
-//            request.setAttribute("cities", cities);
-//            request.setAttribute("vehicles", vehicles);
-//            request.setAttribute("drivers", drivers);
-//            request.setAttribute("uid", uid);
-//            request.getRequestDispatcher("/WEB-INF/pages/newOrder.jsp").forward(request, response);
-//        }
         else {
             List<OrderEntity> orders = new OrderService().getListOfOrders();
-            request.setAttribute("list", orders);
+            request.setAttribute("orders", orders);
             request.getRequestDispatcher("/WEB-INF/pages/orders.jsp").forward(request, response);
         }
 
 
+    }
+
+    private void handleOrdersPage(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<OrderEntity> orders = new OrderService().getListOfOrders();
+        request.setAttribute("orders", orders);
+        request.getRequestDispatcher("/WEB-INF/pages/orders.jsp").forward(request, response);
     }
 
     private void handleDriversPage(HttpServletRequest request, HttpServletResponse response)
@@ -252,6 +264,8 @@ public class ServletFrontController extends HttpServlet {
                 request.setAttribute("driverCity", driverEntity.getCity().getCity());
                 request.setAttribute("monthHours", driverEntity.getMonthHours());
                 request.setAttribute("status", driverEntity.getStatus());
+                request.setAttribute("firstName", driverEntity.getUser().getFirstName());
+                request.setAttribute("lastName", driverEntity.getUser().getLastName());
             } else {
                 request.setAttribute("monthHours", "0");
                 request.setAttribute("status", "free");

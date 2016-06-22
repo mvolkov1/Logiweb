@@ -9,10 +9,10 @@
 
     <title>Drivers</title>
     <style> <%@include file="../css/body.css" %> </style>
-    <style> <%@include file="../css/resultTable.css" %> </style>
+    <style> <%@include file="../css/tables.css" %> </style>
     <style> <%@include file="../css/nav.css" %> </style>
     <style> <%@include file="../css/right.css" %> </style>
-    <style> <%@include file="../css/editOrDelete.css" %> </style>
+    <style> <%@include file="../css/buttons.css" %> </style>
     <script>
         function confirmDelete() {
             return confirm("Delete driver?");
@@ -74,6 +74,7 @@
     <%--</p>--%>
 
 </div>
-
+<br>
+<br>
 </body>
 </html>

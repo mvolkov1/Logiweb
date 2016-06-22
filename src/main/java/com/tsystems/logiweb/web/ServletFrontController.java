@@ -122,17 +122,23 @@ public class ServletFrontController extends HttpServlet {
         String saveCargo = request.getParameter("saveCargo");
         String saveVehicle = request.getParameter("saveVehicle");
         String vin = request.getParameter("vin");
+        String saveDriver = request.getParameter("saveDriver");
+        String driverUid = request.getParameter("driverUid");
+
 
         if (editOrder != null && editOrder.equals("true")) {
 
-            if (!isEmpty) {
+            CityService cityService = new CityService();
 
+            List<CityEntity> cities = cityService.getListOfCities();
+
+            if (!isEmpty) {
                 List<OrderItemEntity> items = null;
                 List<VehicleEntity> vehicles = null;
                 List<CargoEntity> cargos = null;
                 VehicleEntity vehicle = null;
                 List<DriverEntity> drivers = null;
-                List<CityEntity> cities = new CityService().getListOfCities();
+                List<DriverEntity> assignedDrivers = null;
 
                 OrderEntity orderEntity = orderService.getOrderByUid(uid);
                 if (saveId != null && saveId.equals("true")) {
@@ -145,24 +151,26 @@ public class ServletFrontController extends HttpServlet {
                     }
                 }
 
-                if (saveOrderItem != null && saveOrderItem.equals("true"))
-                {
+                if (saveOrderItem != null && saveOrderItem.equals("true")) {
                     String newCity = request.getParameter("newCity");
-                    OrderItemEntity item = new OrderItemEntity();
-                    item.setCity(new CityService().getCityByName(newCity));
-                    item.setOrder(orderEntity);
-                    int nItems = orderEntity.getNumberOfItems();
-                    nItems++;
-                    item.setItemNumber(nItems);
-                    orderEntity.getOrderItems().add(item);
-                    orderEntity.setNumberOfItems(nItems);
-                    orderItemService.addItem(orderEntity, nItems, new CityService().getCityByName(newCity));
-                    orderService.updateOrder(orderEntity, uid, Integer.toString(nItems), "0");
+                    CityEntity cityEntity = cityService.getCityByName(newCity);
+                    if (cityEntity != null) {
+                        OrderItemEntity item = new OrderItemEntity();
+
+                        item.setCity(new CityService().getCityByName(newCity));
+                        item.setOrder(orderEntity);
+                        int nItems = orderEntity.getNumberOfItems();
+                        nItems++;
+                        item.setItemNumber(nItems);
+                        orderEntity.getOrderItems().add(item);
+                        orderEntity.setNumberOfItems(nItems);
+                        orderItemService.addItem(orderEntity, nItems, new CityService().getCityByName(newCity));
+                        orderService.updateOrder(orderEntity, uid, Integer.toString(nItems), "0");
+                    }
                 }
 
                 if (saveCargo != null && saveCargo.equals("true"))
                 {
-                    CityService cityService = new CityService();
                     String cargoId = request.getParameter("cargoId");
                     String mass = request.getParameter("cargoMass");
                     String title = request.getParameter("cargoTitle");
@@ -186,41 +194,69 @@ public class ServletFrontController extends HttpServlet {
                     {
                         VehicleService vehicleService = new VehicleService();
                         vehicle = vehicleService.getVehicleByVin(vin);
-                        vehicle.setOrder(orderEntity);
-                        orderEntity.setVehicle(vehicle);
-                        vehicleService.setOrderForVehicle(vehicle,orderEntity);
+                        if (vehicle != null)
+                        {
+                            vehicle.setOrder(orderEntity);
+                            orderEntity.setVehicle(vehicle);
+                            vehicleService.setOrderForVehicle(vehicle,orderEntity);
+                        }
+
                     }
 
                 }
 
+                if (saveDriver != null && saveDriver.equals("true"))
+                {
+                    DriverService driverService = new DriverService();
+                    DriverEntity driver = new DriverService().getDriverByUid(driverUid);
+                    if (driver != null) {
+                        orderEntity.getDrivers().add(driver);
 
+                        driverService.updateDriver(driver, driverUid, Integer.toString(driver.getMonthHours()), driver.getStatus(), driver.getCity(),
+                                driver.getOrder());
+                    }
+                }
 
-                cargos = (List<CargoEntity>) orderEntity.getCargos();
                 items = (List<OrderItemEntity>) orderEntity.getOrderItems();
                 cargos = (List<CargoEntity>) orderEntity.getCargos();
                 vehicle = orderEntity.getVehicle();
-                drivers = (List<DriverEntity>) orderEntity.getDrivers();
+                drivers = new DriverService().getListOfDrivers();
+                assignedDrivers =  (List<DriverEntity>)orderEntity.getDrivers();
                 vehicles = new VehicleService().getListOfVehicles();
 
-                Set<CityEntity> citiesForOrder = new HashSet<CityEntity>();
+                Set<CityEntity> assignedCities = new HashSet<CityEntity>();
                 if (items != null)
                 {
                     for (OrderItemEntity item:items)
                     {
-                        citiesForOrder.add(item.getCity());
+                        assignedCities.add(item.getCity());
                     }
                 }
 
 
                 request.setAttribute("items", items);
+                if (items != null && items.size() > 0)
+                {
+                    request.setAttribute("hasItems", "true");
+                }
+
                 request.setAttribute("cargos", cargos);
+                if (cargos != null && cargos.size() > 0)
+                {
+                    request.setAttribute("hasCargos", "true");
+                }
                 request.setAttribute("vehicle", vehicle);
                 request.setAttribute("vehicles", vehicles);
                 request.setAttribute("drivers", drivers);
+                request.setAttribute("assignedDrivers", assignedDrivers);
                 request.setAttribute("cities", cities);
-                request.setAttribute("citiesForOrder", citiesForOrder);
+                request.setAttribute("assignedCities", assignedCities);
                 request.setAttribute("uid", uid);
                 request.setAttribute("vin", vin);
+                if (assignedDrivers != null && assignedDrivers.size() > 2)
+                {
+                    request.setAttribute("orderComplelyCreated", "true");
+                }
             }
             request.getRequestDispatcher("/WEB-INF/pages/newOrder.jsp").forward(request, response);
         }

@@ -9,8 +9,11 @@ import javax.persistence.Persistence;
  */
 public class TransactionManager implements AutoCloseable {
 
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("logiweb");
+    private static EntityManagerFactory emf = Persistence.createEntityManagerFactory("logiweb");
     private EntityManager entityManager = emf.createEntityManager();
+
+//    ThreadLocal<List<Whatever>> myThreadLocal =
+//            ThreadLocal.withInitial(ArrayList::new);
 
     public EntityManager getEntityManager() {
         return entityManager;

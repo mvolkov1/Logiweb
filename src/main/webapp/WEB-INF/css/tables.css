@@ -27,3 +27,12 @@ table.cargoTable td {
     border: none;
     padding: 2px;
 }
+
+table.newOrderTable{
+
+}
+
+table.newOrderTable td {
+    border: 1px solid #000;
+    padding: 2px;
+}

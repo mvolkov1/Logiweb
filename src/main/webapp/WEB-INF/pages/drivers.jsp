@@ -51,14 +51,14 @@
                 </td>
                 <td align="center">
                     <form>
-                        <input type="submit" value="Edit" class="editOrDelete">
+                        <input type="submit" value="Edit" class="buttonInCell">
                         <input type="hidden" name="editDriver" value="true">
                         <input type="hidden" name="uid" value=${driver.uid}>
                     </form>
                 </td>
                 <td align="center">
                     <form onsubmit="return confirmDelete()">
-                        <input type="submit" value="Delete" class="editOrDelete">
+                        <input type="submit" value="Delete" class="buttonInCell">
                         <input type="hidden" name="deleteDriver" value="true">
                         <input type="hidden" name="uid" value=${driver.uid}>
                     </form>

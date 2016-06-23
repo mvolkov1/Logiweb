@@ -1,6 +1,6 @@
 package com.tsystems.logiweb.services.impl;
 
-import com.tsystems.logiweb.dao.TransactionManager;
+import com.tsystems.logiweb.services.TransactionManager;
 import com.tsystems.logiweb.dao.api.CityDao;
 import com.tsystems.logiweb.dao.api.VehicleDao;
 import com.tsystems.logiweb.dao.entity.CityEntity;
@@ -9,6 +9,10 @@ import com.tsystems.logiweb.dao.entity.VehicleEntity;
 import com.tsystems.logiweb.dao.impl.CityDaoImpl;
 import com.tsystems.logiweb.dao.impl.VehicleDaoImpl;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -17,119 +21,131 @@ import java.util.List;
  */
 public class VehicleService {
 
-    private TransactionManager transactionManager = TransactionManager.getInstance();
-    private VehicleDao vehicleDao = new VehicleDaoImpl(transactionManager.getEntityManager());
+    private VehicleDao vehicleDao = new VehicleDaoImpl(TransactionManager.getEntityManager());
 
 
-    public synchronized List<VehicleEntity> getListOfVehicles(){
-        return vehicleDao.getAllEntities(VehicleEntity.class);
-    }
-
-    public synchronized  List<VehicleEntity> getListOfVehiclesForOrder(String startCity, short capacity) {
-        return vehicleDao.getListOfVehiclesForOrder(startCity, capacity);
-    }
-
-
-    public synchronized VehicleEntity getVehicleByVin(String vin){
-        return vehicleDao.findByVin(vin);
-    }
-
-
-    public synchronized void addVehicle(String vin, float capacity, int numberOfDrivers, short isAvailable, String city)
+    public void addVehicle(String vin, float capacity, int numberOfDrivers, short isAvailable, String city)
     {
-        try {
-            transactionManager.beginTransaction();
-            try{
+        try{
+            TransactionManager.beginTransaction();
 
-                CityDao cityDao = new CityDaoImpl(transactionManager.getEntityManager());
-                VehicleEntity vehicleEntity = new VehicleEntity();
-                vehicleEntity.setVin(vin);
-                vehicleEntity.setCapacity(new BigDecimal(capacity));
-                vehicleEntity.setNumberOfDrivers(numberOfDrivers);
-                vehicleEntity.setCity(cityDao.findByName(city));
-                vehicleEntity.setIsAvailable(isAvailable);
+            CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
+            VehicleEntity vehicleEntity = new VehicleEntity();
+            vehicleEntity.setVin(vin);
+            vehicleEntity.setCapacity(new BigDecimal(capacity));
+            vehicleEntity.setNumberOfDrivers(numberOfDrivers);
+            vehicleEntity.setCity(cityDao.findByName(city));
+            vehicleEntity.setIsAvailable(isAvailable);
 
-                vehicleDao.save(vehicleEntity);
-
-                transactionManager.commitTransaction();
-
-            } catch (Exception e) {
-
-                transactionManager.rollbackTransaction();
-                //TODO   throw new LogiwebServiceException("", e);
-            } finally {
-//                transactionManager.close();
-            }
+            vehicleDao.save(vehicleEntity);
+            TransactionManager.commit();
         }
-        catch (Exception e)
-        {
-            // TODO throw new TransactionManagerException("",e)
+        catch (Exception e) {
+            TransactionManager.rollback();
         }
     }
 
-    public synchronized void updateVehicle(VehicleEntity vehicleEntity, String vin, String capacity, String numberOfDrivers, String isAvailable,
-                                           CityEntity city, OrderEntity order)
-    {
-        try {
-            transactionManager.beginTransaction();
-            try{
-                vehicleDao.updateVehicle(vehicleEntity, vin, capacity, numberOfDrivers, isAvailable, city, order);
-                transactionManager.commitTransaction();
 
-            } catch (Exception e) {
 
-                transactionManager.rollbackTransaction();
-                //TODO   throw new LogiwebServiceException("", e);
-            } finally {
-//                transactionManager.close();
+    public void handleVehiclesPage(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String deleteVehicle = request.getParameter("deleteVehicle");
+        String newVehicle = request.getParameter("newVehicle");
+        String editVehicle = request.getParameter("editVehicle");
+        String saveVehicle = request.getParameter("saveVehicle");
+        String vin = request.getParameter("vin");
+
+
+        boolean isDeleteVehicle = (deleteVehicle != null) && deleteVehicle.equals("true");
+        boolean IsNewVehicle = (newVehicle != null) && newVehicle.equals("true");
+        boolean isEditVehicle = (editVehicle != null) && editVehicle.equals("true");
+        boolean isSaveVehicle = (saveVehicle != null) && saveVehicle.equals("true");
+        boolean hasVin = (vin != null);
+
+        CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
+        List<CityEntity> cities = null;
+        VehicleEntity vehicleEntity = null;
+        List<VehicleEntity> vehicles = null;
+
+
+        if (isEditVehicle || IsNewVehicle) {
+            if (isEditVehicle && hasVin) {
+                try {
+                    TransactionManager.beginTransaction();
+                    vehicleEntity = vehicleDao.findByVin(vin);
+                    TransactionManager.commit();
+                }
+                catch (Exception e)
+                {
+                    vehicleEntity = null;
+                    TransactionManager.rollback();
+                }
+                if (vehicleEntity != null)
+                {
+                    request.setAttribute("vin", vin);
+                    request.setAttribute("vehicleCity", vehicleEntity.getCity().getCity());
+                    request.setAttribute("capacity", vehicleEntity.getCapacity());
+                    request.setAttribute("numberOfDrivers", vehicleEntity.getNumberOfDrivers());
+                    short isAvailable = vehicleEntity.getIsAvailable();
+                    request.setAttribute("isAvailable", (isAvailable == 0) ? "no" : "yes");
+                }
+
             }
-        }
-        catch (Exception e)
-        {
-            // TODO throw new TransactionManagerException("",e)
-        }
-    }
+            cities = cityDao.getAllEntities(CityEntity.class);
+            request.setAttribute("cities", cities);
+            request.getRequestDispatcher("/WEB-INF/jsp/editVehicle.jsp").forward(request, response);
 
-    public void setOrderForVehicle(VehicleEntity vehicleEntity, OrderEntity orderEntity)
-    {
-        try {
-            transactionManager.beginTransaction();
-            try{
-                vehicleDao.setOrderForVehicle(vehicleEntity, orderEntity);
-                transactionManager.commitTransaction();
+        } else {
 
-            } catch (Exception e) {
+            try {
+                TransactionManager.beginTransaction();
 
-                transactionManager.rollbackTransaction();
-                //TODO   throw new LogiwebServiceException("", e);
-            } finally {
-//                transactionManager.close();
+
+                if (isDeleteVehicle && hasVin)
+                    vehicleDao.deleteByVin(vin);
+
+                if (isSaveVehicle && hasVin) {
+
+                    String capacity = request.getParameter("capacity");
+                    String numberOfDrivers = request.getParameter("numberOfDrivers");
+                    String city = request.getParameter("city");
+                    String isAvailable = request.getParameter("isAvailable1");
+                    isAvailable = isAvailable.equals("no") ? "0" : "1";
+
+                    vehicleEntity = vehicleDao.findByVin(vin);
+
+                    CityEntity cityEntity = cityDao.findByName(city);
+                    vehicleEntity.setCity(cityEntity);
+                    vehicleEntity.setCapacity(new BigDecimal(capacity));
+                    vehicleEntity.setNumberOfDrivers(Integer.parseInt(numberOfDrivers));
+                    vehicleEntity.setIsAvailable(Short.parseShort(isAvailable));
+
+                    if (vehicleEntity != null) {
+                        OrderEntity order = vehicleEntity.getOrder();
+                        vehicleDao.updateVehicle(vehicleEntity, vin, capacity, numberOfDrivers,
+                                isAvailable, cityEntity, order);
+                    } else {
+                        vehicleEntity = new VehicleEntity();
+                        vehicleEntity.setVin(vin);
+                        vehicleEntity.setCity(cityEntity);
+                        vehicleEntity.setCapacity(new BigDecimal(capacity));
+                        vehicleEntity.setNumberOfDrivers(Integer.parseInt(numberOfDrivers));
+                        vehicleEntity.setIsAvailable(Short.parseShort(isAvailable));
+                        vehicleDao.save(vehicleEntity);
+                    }
+                }
+
+                vehicles = vehicleDao.getAllEntities(VehicleEntity.class);
+
+                TransactionManager.commit();
             }
-        }
-        catch (Exception e)
-        {
-            // TODO throw new TransactionManagerException("",e)
-        }
-    }
-
-    public synchronized void deleteVehicle(String vin)
-    {
-        try {
-            transactionManager.beginTransaction();
-            try{
-                vehicleDao.deleteByVin(vin);
-                transactionManager.commitTransaction();
-            } catch (Exception e) {
-
-                transactionManager.rollbackTransaction();
-                //TODO   throw new LogiwebServiceException("", e);
-            } finally {
-//                transactionManager.close();
+            catch (Exception e)
+            {
+                TransactionManager.rollback();
             }
-        }
-        catch (Exception e)
-        {
-            // TODO throw new TransactionManagerException("",e)
+            request.setAttribute("list", vehicles);
+            request.getRequestDispatcher("/WEB-INF/jsp/vehicles.jsp").forward(request, response);
         }
     }
 

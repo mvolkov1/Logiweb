@@ -25,11 +25,9 @@
     <script> <%@include file="../js/newOrder.js" %> </script>
 
 
-    <style>
-        select:invalid {
-            color: gray;
-        }
-    </style>
+
+
+
 
 
     <title>New order</title>
@@ -91,7 +89,7 @@
                     <c:if test="${empty vehicle}">
                         <form onsubmit="return onAddOrderItem()" action="newOrder" method="post">
                             <select name="newCity" id="newCity">
-                                <option disabled selected hidden>Select city...</option>
+                                <option value="" disabled selected hidden>Select city...</option>
                                 <c:forEach var="city" items="${cities}">
                                     <option value="${city.city}">${city.city}</option>
                                 </c:forEach>
@@ -242,7 +240,7 @@
                                 </c:if>
                                 <br>
 
-                                <c:if test="${empty orderComplelyCreated}">
+                                <c:if test="${empty orderCompletlyCreated}">
                                     <form action="newOrder" method="post" onsubmit="return onAddDriver()">
                                         <select name="driverUid" id="driverUid">
                                             <option value="" disabled selected hidden>Select driver...</option>

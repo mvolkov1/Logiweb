@@ -51,7 +51,7 @@
         <h3>No orders found in the database</h3>
     </c:if>
 
-    <form action="newOrder"  method="post" >
+    <form action="order"  method="post" >
         <input type="submit" value="Add order" class="buttonAddToTable">
         <input type="hidden" name="editOrder" value="true">
         <input type="hidden" name="emptyOrder" value="true">

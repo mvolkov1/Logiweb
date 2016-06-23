@@ -9,3 +9,6 @@ select.edit {
  }
 
 
+select:invalid {
+    color: gray;
+}

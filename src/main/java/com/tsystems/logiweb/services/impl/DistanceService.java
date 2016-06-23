@@ -1,6 +1,6 @@
 package com.tsystems.logiweb.services.impl;
 
-import com.tsystems.logiweb.dao.TransactionManager;
+import com.tsystems.logiweb.services.TransactionManager;
 import com.tsystems.logiweb.dao.api.CityDao;
 import com.tsystems.logiweb.dao.api.DistanceDao;
 import com.tsystems.logiweb.dao.entity.DistanceEntity;
@@ -15,33 +15,22 @@ import java.util.List;
  */
 public class DistanceService {
 
-    private TransactionManager transactionManager = TransactionManager.getInstance();
-    private DistanceDao distanceDao = new DistanceDaoImpl(transactionManager.getEntityManager());
+    private DistanceDao distanceDao = new DistanceDaoImpl(TransactionManager.getEntityManager());
 
-    public synchronized List<DistanceEntity> getListOfDistances(){
-        return distanceDao.getAllEntities(DistanceEntity.class);
-    }
-
-    public void addDistance(String city1, String city2, float distance)
-    {
+    public void addDistance(String city1, String city2, float distance) {
         try {
-            transactionManager.beginTransaction();
-            try {
-                CityDao cityDao = new CityDaoImpl(transactionManager.getEntityManager());
+            TransactionManager.beginTransaction();
 
-                DistanceEntity distanceEntity = new DistanceEntity();
-                distanceEntity.setCity1(cityDao.findByName(city1));
-                distanceEntity.setCity2(cityDao.findByName(city2));
-                distanceEntity.setDistance(new BigDecimal(distance));
-                distanceDao.save(distanceEntity);
-                transactionManager.commitTransaction();
-            }
-            catch (Exception e)
-            {
-                transactionManager.rollbackTransaction();
-            }
+            CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
+
+            DistanceEntity distanceEntity = new DistanceEntity();
+            distanceEntity.setCity1(cityDao.findByName(city1));
+            distanceEntity.setCity2(cityDao.findByName(city2));
+            distanceEntity.setDistance(new BigDecimal(distance));
+            distanceDao.save(distanceEntity);
+            TransactionManager.commit();
+        } catch (Exception e) {
+            TransactionManager.rollback();
         }
-        catch (Exception e)
-        {}
     }
 }

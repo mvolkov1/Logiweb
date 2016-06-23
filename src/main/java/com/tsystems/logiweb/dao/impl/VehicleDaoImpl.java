@@ -1,6 +1,5 @@
 package com.tsystems.logiweb.dao.impl;
 
-import com.tsystems.logiweb.dao.TransactionManager;
 import com.tsystems.logiweb.dao.api.VehicleDao;
 import com.tsystems.logiweb.dao.entity.CityEntity;
 import com.tsystems.logiweb.dao.entity.OrderEntity;

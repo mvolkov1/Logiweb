@@ -1,7 +1,6 @@
 package com.tsystems.logiweb.dao.impl;
 
 
-import com.tsystems.logiweb.dao.TransactionManager;
 import com.tsystems.logiweb.dao.api.BaseDao;
 
 import javax.persistence.*;

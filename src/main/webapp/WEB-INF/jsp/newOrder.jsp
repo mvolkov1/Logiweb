@@ -224,13 +224,11 @@
                                 <c:if test="${fn:length(assignedDrivers) > 0}">
                                     <table class="resultTable">
                                         <th>UID</th>
-                                        <th>First name</th>
-                                        <th>Last name</th>
+                                        <th>Name</th>
                                         <c:forEach var="driver1" items="${assignedDrivers}">
                                             <tr>
                                                 <td> ${driver1.uid} </td>
-                                                <td> ${driver1.user.firstName} </td>
-                                                <td> ${driver1.user.lastName} </td>
+                                                <td> <c:out value="${driver1.user.firstName} ${driver1.user.lastName}"></c:out> </td>
                                             </tr>
                                         </c:forEach>
                                     </table>

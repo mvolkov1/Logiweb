@@ -4,6 +4,8 @@ import com.tsystems.logiweb.dao.entity.CityEntity;
 import com.tsystems.logiweb.dao.entity.DriverEntity;
 import com.tsystems.logiweb.dao.entity.OrderEntity;
 
+import java.util.List;
+
 
 /**
  * Created by mvolkov on 13.06.2016.
@@ -13,4 +15,6 @@ public interface DriverDao extends BaseDao<DriverEntity> {
     public void deleteByUid(String uid);
     public void updateDriver(DriverEntity driver, String uid, String monthHours, String status,
                               CityEntity city, OrderEntity order);
+    public List<DriverEntity> getFreeDrivers();
+    public void setOrderForDriver(DriverEntity driver, OrderEntity order);
 }

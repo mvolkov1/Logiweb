@@ -60,8 +60,6 @@ public class DriverService {
     public void handleDriversPage(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        DriverService driverService = new DriverService();
-
         String deleteDriver = request.getParameter("deleteDriver");
         String newDriver = request.getParameter("newDriver");
         String editDriver = request.getParameter("editDriver");
@@ -76,20 +74,24 @@ public class DriverService {
         boolean isSaveDriver = (saveDriver != null) && saveDriver.equals("true");
         boolean hasUid = (uid != null);
 
+        DriverEntity driverEntity = null;
+
         if (isEditDriver || IsNewDriver) {
             if (isEditDriver && hasUid) {
                 try {
                     TransactionManager.beginTransaction();
-                    DriverEntity driverEntity = driverDao.findByUid(uid);
+                    driverEntity = driverDao.findByUid(uid);
+                    TransactionManager.commit();
+                } catch (Exception e) {
+                    TransactionManager.rollback();
+                }
+                if (driverEntity != null) {
                     request.setAttribute("uid", uid);
                     request.setAttribute("driverCity", driverEntity.getCity().getCity());
                     request.setAttribute("monthHours", driverEntity.getMonthHours());
                     request.setAttribute("status", driverEntity.getStatus());
                     request.setAttribute("firstName", driverEntity.getUser().getFirstName());
                     request.setAttribute("lastName", driverEntity.getUser().getLastName());
-                    TransactionManager.commit();
-                } catch (Exception e) {
-                    TransactionManager.rollback();
                 }
             } else {
                 request.setAttribute("monthHours", "0");
@@ -116,7 +118,7 @@ public class DriverService {
                     String status = request.getParameter("status1");
                     String city = request.getParameter("city");
 
-                    DriverEntity driverEntity = driverDao.findByUid(uid);
+                    driverEntity = driverDao.findByUid(uid);
                     if (driverEntity != null) {
                         OrderEntity order = driverEntity.getOrder();
                         CityEntity cityEntity = cityDao.findByName(city);
@@ -135,7 +137,8 @@ public class DriverService {
                 drivers = driverDao.getAllEntities(DriverEntity.class);
                 TransactionManager.commit();
             } catch (Exception e) {
-                TransactionManager.rollback();
+                if (TransactionManager.isActive())
+                    TransactionManager.rollback();
             }
             request.setAttribute("list", drivers);
             request.getRequestDispatcher("/WEB-INF/jsp/drivers.jsp").forward(request, response);

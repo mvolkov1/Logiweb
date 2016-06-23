@@ -51,6 +51,10 @@ public class TransactionManager {
         getEntityManager().getTransaction().commit();
     }
 
+    public static boolean isActive() {
+        return getEntityManager().getTransaction().isActive();
+    }
+
 
 //    public void commitTransaction() {
 //        entityManager.getTransaction().commit();

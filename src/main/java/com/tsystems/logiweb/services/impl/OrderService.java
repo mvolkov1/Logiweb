@@ -54,13 +54,7 @@ public class OrderService {
         String saveDriver = request.getParameter("saveDriver");
         String driverUid = request.getParameter("driverUid");
 
-        String orderId = request.getParameter("orderId");
-        if (path.equals("/Logiweb/order") && orderId != null)
-        {
-            editOrder = "true";
-            uid = orderId;
-            request.setAttribute("orderCompletlyCreated", "true");
-        }
+
 
 
         List<OrderItemEntity> items = null;
@@ -71,6 +65,21 @@ public class OrderService {
         List<DriverEntity> assignedDrivers = null;
         List<CityEntity> cities = null;
         Set<CityEntity> assignedCities = null;
+
+        String orderId = request.getParameter("orderId");
+        if (path.equals("/Logiweb/order") && orderId != null)
+        {
+            editOrder = "true";
+            isEmpty = false;
+            saveId = null;
+            saveOrderItem = null;
+            saveCargo = null;
+            saveVehicle = null;
+            saveDriver = null;
+
+            uid = orderId;
+            request.setAttribute("orderCompletlyCreated", "true");
+        }
 
         if (editOrder != null && editOrder.equals("true")) {
 
@@ -128,7 +137,6 @@ public class OrderService {
 
                     if (saveVehicle != null && saveVehicle.equals("true")) {
                         if (vin != null) {
-                            VehicleService vehicleService = new VehicleService();
                             vehicle = vehicleDao.findByVin(vin);
                             if (vehicle != null) {
                                 vehicle.setOrder(orderEntity);
@@ -141,16 +149,16 @@ public class OrderService {
                     if (saveDriver != null && saveDriver.equals("true")) {
                         DriverEntity driver = driverDao.findByUid(driverUid);
                         if (driver != null) {
+                            driver.setOrder(orderEntity);
                             orderEntity.getDrivers().add(driver);
-                            driverDao.updateDriver(driver, driverUid, Integer.toString(driver.getMonthHours()),
-                                    driver.getStatus(), driver.getCity(), orderEntity);
+                            driverDao.setOrderForDriver(driver, orderEntity);
                         }
                     }
 
                     items = (List<OrderItemEntity>) orderEntity.getOrderItems();
                     cargos = (List<CargoEntity>) orderEntity.getCargos();
                     vehicle = orderEntity.getVehicle();
-                    drivers = driverDao.getAllEntities(DriverEntity.class);
+                    drivers = driverDao.getFreeDrivers();
                     assignedDrivers = (List<DriverEntity>) orderEntity.getDrivers();
                     vehicles = vehicleDao.getAllEntities(VehicleEntity.class);
 
@@ -184,7 +192,8 @@ public class OrderService {
                 request.setAttribute("assignedCities", assignedCities);
                 request.setAttribute("uid", uid);
                 request.setAttribute("vin", vin);
-                if (assignedDrivers != null && assignedDrivers.size() > 2) {
+                if (assignedDrivers != null && vehicle != null &&
+                        assignedDrivers.size() == vehicle.getNumberOfDrivers()) {
                     request.setAttribute("orderCompletlyCreated", "true");
                 }
             }

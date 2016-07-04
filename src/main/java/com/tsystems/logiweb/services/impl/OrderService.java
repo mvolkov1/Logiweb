@@ -26,9 +26,20 @@ public class OrderService {
     CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
     OrderItemDao orderItemDao = new OrderItemDaoImpl(TransactionManager.getEntityManager());
 
-    public List<OrderEntity> getListOfOrders() {
-        return orderDao.getAllEntities(OrderEntity.class);
+    public static void createOrder(String uid) {
+        try {
+            TransactionManager.beginTransaction();
+            OrderEntity orderEntity = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
+            if (orderEntity == null) {
+                orderEntity = new OrderEntity();
+                orderEntity.setUid(uid);
+            }
+            TransactionManager.commit();
+        } catch (Exception e) {
+            TransactionManager.rollback();
+        }
     }
+
 
     public void addItem(OrderEntity orderEntity, int itemNumber, CityEntity cityEntity) {
         OrderItemDao orderItemDao = new OrderItemDaoImpl(TransactionManager.getEntityManager());
@@ -38,6 +49,61 @@ public class OrderService {
         orderItemEntity.setCity(cityEntity);
         orderItemDao.save(orderItemEntity);
     }
+
+    public static String handleEditOrder(HttpServletRequest request) {
+        String address = null;
+
+        OrderDao orderDao = new OrderDaoImpl(TransactionManager.getEntityManager());
+        CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
+        OrderItemDao orderItemDao = new OrderItemDaoImpl(TransactionManager.getEntityManager());
+
+        String uid = request.getParameter("uid");
+        String saveOrder = request.getParameter("saveOrder");
+        String oldUid = request.getParameter("oldUid");
+        String saveOrderItem = request.getParameter("saveOrderItem");
+        String city = request.getParameter("city");
+
+        if (uid != null && !uid.isEmpty()) {
+            try {
+                TransactionManager.beginTransaction();
+
+                OrderEntity orderEntity = orderDao.findByUid(oldUid == null ? uid : oldUid);
+                if (orderEntity == null) {
+                    orderEntity = new OrderEntity();
+                    orderEntity.setUid(uid);
+                    orderDao.save(orderEntity);
+                }
+
+                if (city != null && !city.isEmpty()) {
+                    OrderItemEntity orderItemEntity = new OrderItemEntity();
+                    CityEntity cityEntity = null;
+                    cityEntity = cityDao.findByName(city);
+                    if (cityEntity != null) {
+                        orderItemEntity.setCity(cityDao.findByName(city));
+                        orderItemEntity.setItemNumber(orderEntity.getOrderItems().size() + 1);
+                        orderItemEntity.setOrder(orderEntity);
+                        orderEntity.getOrderItems().add(orderItemEntity);
+                    }
+                }
+                TransactionManager.commit();
+
+                List<OrderItemEntity> items = (List<OrderItemEntity>) orderEntity.getOrderItems();
+                request.setAttribute("items", items);
+            } catch (Exception e) {
+                TransactionManager.rollback();
+            }
+            request.setAttribute("uid", uid);
+        }
+        List<CityEntity> cities = cityDao.getAllEntities(CityEntity.class);
+        request.setAttribute("cities", cities);
+
+        return "/WEB-INF/jsp/editOrder.jsp";
+    }
+
+    public void showOrder(HttpServletRequest request) {
+
+    }
+
 
     public void handleNewOrder(HttpServletRequest request, HttpServletResponse response, String path)
             throws ServletException, IOException {
@@ -55,8 +121,6 @@ public class OrderService {
         String driverUid = request.getParameter("driverUid");
 
 
-
-
         List<OrderItemEntity> items = null;
         List<VehicleEntity> vehicles = null;
         List<CargoEntity> cargos = null;
@@ -67,8 +131,7 @@ public class OrderService {
         Set<CityEntity> assignedCities = null;
 
         String orderId = request.getParameter("orderId");
-        if (path.equals("/Logiweb/order") && orderId != null)
-        {
+        if (path.equals("/Logiweb/order") && orderId != null) {
             editOrder = "true";
             isEmpty = false;
             saveId = null;
@@ -89,7 +152,7 @@ public class OrderService {
 
                     cities = cityDao.getAllEntities(CityEntity.class);
 
-                    OrderEntity orderEntity = orderDao.findByOrderId(uid);
+                    OrderEntity orderEntity = orderDao.findByUid(uid);
                     if (saveId != null && saveId.equals("true")) {
                         if (orderEntity == null) {
                             orderEntity = new OrderEntity();
@@ -110,10 +173,8 @@ public class OrderService {
                             int nItems = orderEntity.getNumberOfItems();
                             nItems++;
                             item.setItemNumber(nItems);
-                            orderEntity.getOrderItems().add(item);
                             orderEntity.setNumberOfItems(nItems);
-                            this.addItem(orderEntity, nItems, cityDao.findByName(newCity));
-                            orderDao.updateOrder(orderEntity, uid, Integer.toString(nItems), "0");
+                            orderItemDao.save(item);
                         }
                     }
 
@@ -132,7 +193,6 @@ public class OrderService {
                         cargo.setOrder(orderEntity);
                         cargo.setStatus("Prepared");
                         cargoDao.save(cargo);
-                        orderEntity.getCargos().add(cargo);
                     }
 
                     if (saveVehicle != null && saveVehicle.equals("true")) {
@@ -141,7 +201,7 @@ public class OrderService {
                             if (vehicle != null) {
                                 vehicle.setOrder(orderEntity);
                                 orderEntity.setVehicle(vehicle);
-                                vehicleDao.setOrderForVehicle(vehicle, orderEntity);
+                                vehicleDao.merge(vehicle); //setOrderForVehicle(vehicle, orderEntity);
                             }
                         }
                     }
@@ -160,17 +220,26 @@ public class OrderService {
                     vehicle = orderEntity.getVehicle();
                     drivers = driverDao.getFreeDrivers();
                     assignedDrivers = (List<DriverEntity>) orderEntity.getDrivers();
-                    vehicles = vehicleDao.getAllEntities(VehicleEntity.class);
+
 
                     assignedCities = new HashSet<CityEntity>();
                     if (items != null) {
                         for (OrderItemEntity item : items) {
                             assignedCities.add(item.getCity());
                         }
+                    } else {
+                        assignedCities = null;
                     }
 
                     TransactionManager.commit();
+
+                    if (cargos != null && items != null && cargos.size() > 0 && items.size() > 0) {
+                        vehicles = vehicleDao.getListOfVehiclesForOrder(orderEntity);
+                    }
+
+
                 } catch (Exception e) {
+
                     TransactionManager.rollback();
                 }
 
@@ -195,9 +264,10 @@ public class OrderService {
                 if (assignedDrivers != null && vehicle != null &&
                         assignedDrivers.size() == vehicle.getNumberOfDrivers()) {
                     request.setAttribute("orderCompletlyCreated", "true");
+                    request.setAttribute("editOrder", "false");
                 }
             }
-            request.getRequestDispatcher("/WEB-INF/jsp/newOrder.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/jsp/editOrder.jsp").forward(request, response);
         } else {
             List<OrderEntity> orders = new OrderService().getListOfOrders();
             request.setAttribute("orders", orders);
@@ -212,12 +282,23 @@ public class OrderService {
             TransactionManager.beginTransaction();
             orders = orderDao.getAllEntities(OrderEntity.class);
             TransactionManager.commit();
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             TransactionManager.rollback();
-            orders=null;
+            orders = null;
         }
         request.setAttribute("orders", orders);
         request.getRequestDispatcher("/WEB-INF/jsp/orders.jsp").forward(request, response);
+    }
+
+    public static List<OrderEntity> getListOfOrders() {
+        List<OrderEntity> orders = null;
+        try {
+            TransactionManager.beginTransaction();
+            orders = new OrderDaoImpl(TransactionManager.getEntityManager()).getAllEntities(OrderEntity.class);
+            TransactionManager.commit();
+        } catch (Exception e) {
+            orders = null;
+        }
+        return orders;
     }
 }

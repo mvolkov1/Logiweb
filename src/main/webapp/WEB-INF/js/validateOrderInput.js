@@ -2,6 +2,18 @@
  * Created by mvolkov on 22.06.2016.
  */
 
+function validateOrderInput() {
+    var uid = document.getElementById("uid").value;
+    if (!uid) {
+        alert('Please enter UID');
+        return false;
+    }
+    if (uid.length < 8) {
+        alert('UID should contain 8 alphanumeric characters!');
+        return false;
+    }
+}
+
 
 function checkUid() {
     var length = document.getElementById("uid").value.length;
@@ -36,8 +48,7 @@ function onAddCargo() {
         alert('Enter cargo mass!');
         return false;
     }
-    if (isNaN(mass))
-    {
+    if (isNaN(mass)) {
         alert('Please enter numeric value for the mass');
         return false;
     }
@@ -54,7 +65,6 @@ function onAddCargo() {
 }
 
 function onSetVehicle() {
-    
 
 
     if (!document.getElementById("orderVehicle").value) {
@@ -65,12 +75,12 @@ function onSetVehicle() {
 }
 
 function onAddDriver() {
-    
+
     if (!document.getElementById("driverUid").value) {
         alert('Select driver!');
         return false;
     }
-    
+
 }
 
 

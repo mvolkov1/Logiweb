@@ -11,15 +11,14 @@ import java.util.List;
  */
 public interface VehicleDao extends BaseDao<VehicleEntity>{
     public VehicleEntity findByVin(String name);
-    public void setAvailable(VehicleEntity vehicle, boolean isAvailable);
-    public void setCity(VehicleEntity vehicle, String city);
-    public void setOrder(VehicleEntity vehicle, OrderEntity order);
+//    public void setAvailable(VehicleEntity vehicle, boolean isAvailable);
+//    public void setCity(VehicleEntity vehicle, String city);
+//    public void setOrder(VehicleEntity vehicle, OrderEntity order);
     public void deleteByVin(String vin);
 
-    public void updateVehicle(VehicleEntity vehicle, String vin, String capacity, String numberOfDrivers, String isAvailable,
-                              CityEntity city, OrderEntity order);
-
-    public  List<VehicleEntity> getListOfVehiclesForOrder(String startCity, short capacity);
-
-    public void setOrderForVehicle(VehicleEntity vehicleEntity, OrderEntity orderEntity);
+//    public void updateVehicle(VehicleEntity vehicle, String vin, String capacity, String numberOfDrivers, String isAvailable,
+//                              CityEntity city, OrderEntity order);
+//
+//    public void setOrderForVehicle(VehicleEntity vehicleEntity, OrderEntity orderEntity);
+    public List<VehicleEntity> getListOfVehiclesForOrder(OrderEntity orderEntity);
 }

@@ -12,9 +12,9 @@ import java.util.Collection;
 public class CityEntity {
     private long id;
     private String city;
-    private Collection<VehicleEntity> vehicles;
-    private Collection<DriverEntity> drivers;
-    private Collection<OrderItemEntity> orderItems;
+ //   private Collection<VehicleEntity> vehicles;
+  //  private Collection<DriverEntity> drivers;
+//    private Collection<OrderItemEntity> orderItems;
 
 
     public CityEntity(){super();}
@@ -42,30 +42,30 @@ public class CityEntity {
     }
 
 
-    @OneToMany(mappedBy = "city")
-    public Collection<DriverEntity> getDrivers() {
-        return drivers;
-    }
+//    @OneToMany(mappedBy = "city")
+//    public Collection<DriverEntity> getDrivers() {
+//        return drivers;
+//    }
+//
+//    public void setDrivers(Collection<DriverEntity> driversById) {
+//        this.drivers = driversById;
+//    }
 
-    public void setDrivers(Collection<DriverEntity> driversById) {
-        this.drivers = driversById;
-    }
+//    @OneToMany(mappedBy = "city")
+//    public Collection<OrderItemEntity> getOrderItems() {
+//        return orderItems;
+//    }
+//
+//    public void setOrderItems(Collection<OrderItemEntity> orderitemsesById) {
+//        this.orderItems = orderitemsesById;
+//    }
 
-    @OneToMany(mappedBy = "city")
-    public Collection<OrderItemEntity> getOrderItems() {
-        return orderItems;
-    }
-
-    public void setOrderItems(Collection<OrderItemEntity> orderitemsesById) {
-        this.orderItems = orderitemsesById;
-    }
-
-    @OneToMany(mappedBy = "city")
-    public Collection<VehicleEntity> getVehicles() {
-        return vehicles;
-    }
-
-    public void setVehicles(Collection<VehicleEntity> vehiclesById) {
-        this.vehicles = vehiclesById;
-    }
+//    @OneToMany(mappedBy = "city")
+//    public Collection<VehicleEntity> getVehicles() {
+//        return vehicles;
+//    }
+//
+//    public void setVehicles(Collection<VehicleEntity> vehiclesById) {
+//        this.vehicles = vehiclesById;
+//    }
 }

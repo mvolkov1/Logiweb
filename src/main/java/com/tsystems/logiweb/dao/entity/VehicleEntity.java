@@ -72,7 +72,7 @@ public class VehicleEntity {
     }
 
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "orderId", referencedColumnName = "id")
     public OrderEntity getOrder() {
         return order;
@@ -82,7 +82,7 @@ public class VehicleEntity {
         this.order = order;
     }
 
-    @ManyToOne
+    @OneToOne//(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "cityId", referencedColumnName = "id", nullable = false)
     public CityEntity getCity() {
         return city;

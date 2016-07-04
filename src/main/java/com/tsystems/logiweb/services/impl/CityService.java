@@ -26,4 +26,9 @@ public class CityService {
         }
 
     }
+
+    public static List<CityEntity> getListOfCities()
+    {
+        return new CityDaoImpl(TransactionManager.getEntityManager()).getAllEntities(CityEntity.class);
+    }
 }

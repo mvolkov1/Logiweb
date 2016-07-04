@@ -91,7 +91,7 @@ public class OrderEntity {
         this.vehicle = vehicle;
     }
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
     public Collection<OrderItemEntity> getOrderItems() {
         return orderItems;
     }

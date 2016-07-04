@@ -21,13 +21,13 @@ import java.util.List;
  */
 public class DriverService {
 
-    private DriverDao driverDao = new DriverDaoImpl(TransactionManager.getEntityManager());
 
+    public static void addDriver(String login, String password, String firstName, String lastName,
+                                 String uid, int monthHours, String status, String city) {
 
-    public void addDriver(String login, String password, String firstName, String lastName,
-                          String uid, int monthHours, String status, String city) {
+        DriverDao driverDao = new DriverDaoImpl(TransactionManager.getEntityManager());
 
-        try{
+        try {
             TransactionManager.beginTransaction();
             DriverEntity driverEntity = new DriverEntity();
             driverEntity.setUid(uid);
@@ -47,9 +47,7 @@ public class DriverService {
             driverDao.save(driverEntity);
             TransactionManager.commit();
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             TransactionManager.rollback();
         }
 
@@ -57,91 +55,55 @@ public class DriverService {
     }
 
 
-    public void handleDriversPage(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    public static List<DriverEntity> getListOfDrivers() {
 
-        String deleteDriver = request.getParameter("deleteDriver");
-        String newDriver = request.getParameter("newDriver");
-        String editDriver = request.getParameter("editDriver");
-        String saveDriver = request.getParameter("saveDriver");
-        String uid = request.getParameter("uid");
+        List<DriverEntity> drivers = null;
+        try {
+            TransactionManager.beginTransaction();
+            drivers = new DriverDaoImpl(TransactionManager.getEntityManager()).getAllEntities(DriverEntity.class);
+            TransactionManager.commit();
+        }
+        catch (Exception e)
+        {
+            drivers = null;
+        }
+        return drivers;
+    }
 
-        CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
+    public static DriverEntity getDriver(String uid) {
+        DriverEntity driver = null;
+        try {
+            TransactionManager.beginTransaction();
+            driver = new DriverDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
+            TransactionManager.commit();
+        }
+        catch (Exception e)
+        {
+            driver = null;
+        }
+        return driver;
+    }
 
-        boolean isDeleteDriver = (deleteDriver != null) && deleteDriver.equals("true");
-        boolean IsNewDriver = (newDriver != null) && newDriver.equals("true");
-        boolean isEditDriver = (editDriver != null) && editDriver.equals("true");
-        boolean isSaveDriver = (saveDriver != null) && saveDriver.equals("true");
-        boolean hasUid = (uid != null);
-
-        DriverEntity driverEntity = null;
-
-        if (isEditDriver || IsNewDriver) {
-            if (isEditDriver && hasUid) {
-                try {
-                    TransactionManager.beginTransaction();
-                    driverEntity = driverDao.findByUid(uid);
-                    TransactionManager.commit();
-                } catch (Exception e) {
-                    TransactionManager.rollback();
-                }
-                if (driverEntity != null) {
-                    request.setAttribute("uid", uid);
-                    request.setAttribute("driverCity", driverEntity.getCity().getCity());
-                    request.setAttribute("monthHours", driverEntity.getMonthHours());
-                    request.setAttribute("status", driverEntity.getStatus());
-                    request.setAttribute("firstName", driverEntity.getUser().getFirstName());
-                    request.setAttribute("lastName", driverEntity.getUser().getLastName());
-                }
-            } else {
-                request.setAttribute("monthHours", "0");
-                request.setAttribute("status", "free");
-            }
-
-            List<CityEntity> cities = cityDao.getAllEntities(CityEntity.class);
-            request.setAttribute("cities", cities);
-            request.getRequestDispatcher("/WEB-INF/jsp/editDriver.jsp").forward(request, response);
-
-        } else {
-
-            List<DriverEntity> drivers = null;
-
+    public static void saveDriver(String uid, String oldUid, String monthHours, String status, String city) {
+        DriverDao driverDao = new DriverDaoImpl(TransactionManager.getEntityManager());
+        if (oldUid != null && !oldUid.isEmpty() && monthHours != null && status != null && city != null) {
             try {
                 TransactionManager.beginTransaction();
-
-                if (isDeleteDriver && hasUid)
-                    driverDao.deleteByUid(uid);
-
-                if (isSaveDriver && hasUid) {
-
-                    String monthHours = request.getParameter("monthHours");
-                    String status = request.getParameter("status1");
-                    String city = request.getParameter("city");
-
-                    driverEntity = driverDao.findByUid(uid);
-                    if (driverEntity != null) {
-                        OrderEntity order = driverEntity.getOrder();
-                        CityEntity cityEntity = cityDao.findByName(city);
-
-                        driverEntity.setCity(cityEntity);
-                        driverEntity.setStatus(status);
-                        driverEntity.setMonthHours(Integer.parseInt(monthHours));
-
-                        driverDao.updateDriver(driverEntity, uid, monthHours, status, cityEntity, order);
-                    } else {
-                        //   driverService.addDriver(uid, Float.parseFloat(capacity), Integer.parseInt(numberOfDrivers),
-                        //   Short.parseShort(isAvailable),city);
-                    }
+                DriverEntity driverEntity = driverDao.findByUid(oldUid);
+                if (driverEntity != null) {
+                    CityEntity cityEntity = new CityDaoImpl(TransactionManager.getEntityManager()).findByName(city);
+                    driverEntity.setUid(uid);
+                    driverEntity.setCity(cityEntity);
+                    driverEntity.setStatus(status);
+                    driverEntity.setMonthHours(Integer.parseInt(monthHours));
+                    driverDao.save(driverEntity);
+                    TransactionManager.commit();
                 }
-
-                drivers = driverDao.getAllEntities(DriverEntity.class);
-                TransactionManager.commit();
             } catch (Exception e) {
-                if (TransactionManager.isActive())
-                    TransactionManager.rollback();
+                TransactionManager.rollback();
             }
-            request.setAttribute("list", drivers);
-            request.getRequestDispatcher("/WEB-INF/jsp/drivers.jsp").forward(request, response);
         }
     }
 }
+
+

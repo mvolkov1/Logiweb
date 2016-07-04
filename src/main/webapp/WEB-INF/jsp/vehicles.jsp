@@ -35,7 +35,7 @@
         <th>Capacity</th>
         <th>Number of drivers</th>
         <th>City</th>
-        <th>Is available? </th>
+        <th>Is available?</th>
         <th>Order ID</th>
 
 
@@ -49,14 +49,13 @@
                 <td><a href="order?orderId=${vehicle.order.uid}"> ${vehicle.order.uid}</a>
                 </td>
                 <td align="center">
-                    <form>
+                    <form action="editVehicle" method="get">
                         <input type="submit" value="Edit" class="buttonInCell">
-                        <input type="hidden" name="editVehicle" value="true">
                         <input type="hidden" name="vin" value=${vehicle.vin}>
                     </form>
                 </td>
                 <td align="center">
-                    <form onsubmit="return confirmDelete()">
+                    <form onsubmit="return confirmDelete()" method="post">
                         <input type="submit" value="Delete" class="buttonInCell">
                         <input type="hidden" name="deleteVehicle" value="true">
                         <input type="hidden" name="vin" value=${vehicle.vin}>
@@ -68,10 +67,8 @@
 
 
     <p>
-
-    <form>
-        <input type="submit" value="Add new vehicle"  class="buttonAddToTable">
-        <input type="hidden" name="newVehicle" value="true">
+    <form action="editVehicle" method="get">
+        <input type="submit" value="Add new vehicle" class="buttonAddToTable">
     </form>
 
     </p>

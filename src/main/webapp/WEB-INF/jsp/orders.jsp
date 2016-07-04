@@ -35,12 +35,26 @@
             <th>Is completed</th>
             <c:forEach var="order" items="${orders}">
                 <tr>
-                    <td><a href="http://localhost:8080/Logiweb/order?orderId=${order.uid}"
-                           class="tableRef"> ${order.uid}</a></td>
-                    <td> ${order.numberOfItems} </td>
+                    <td>
+
+                    <form action="editOrder" method="get">
+                        <input type="submit" value="${order.uid}" class="buttonInCell">
+                        <input type="hidden" name="uid" value=${order.uid}>
+                    </form>
+
+                    </td>
+                    <%--<td><a href="editOrder?uid=${order.uid}" class="tableRef"> ${order.uid}</a></td>--%>
+                    <td> ${order.orderItems.size()} </td>
                     <td> ${order.cargos.size()} </td>
                     <td> ${order.vehicle.vin}</td>
                     <td> ${order.isCompleted} </td>
+                    <td align="center" method="get">
+                        <form onsubmit="return confirmDelete()">
+                            <input type="submit" value="Delete" class="buttonInCell">
+                            <input type="hidden" name="deleteOrder" value="true">
+                            <input type="hidden" name="uid" value=${order.uid}>
+                        </form>
+                    </td>
                 </tr>
             </c:forEach>
         </table>
@@ -51,10 +65,8 @@
         <h3>No orders found in the database</h3>
     </c:if>
 
-    <form action="order"  method="post" >
+    <form action="editOrder" method="get">
         <input type="submit" value="Add order" class="buttonAddToTable">
-        <input type="hidden" name="editOrder" value="true">
-        <input type="hidden" name="emptyOrder" value="true">
     </form>
 
 </div>

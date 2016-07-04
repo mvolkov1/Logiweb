@@ -35,8 +35,7 @@ public class OrderItemEntity {
         this.itemNumber = itemNumber;
     }
 
-
-    @ManyToOne
+    @OneToOne(optional = false)
     @JoinColumn(name = "cityId", referencedColumnName = "id", nullable = false)
     public CityEntity getCity() {
         return city;
@@ -46,7 +45,7 @@ public class OrderItemEntity {
         this.city = city;
     }
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "orderId", referencedColumnName = "id", nullable = false)
     public OrderEntity getOrder() {
         return order;

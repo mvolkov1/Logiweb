@@ -18,10 +18,10 @@ public class OrderDaoImpl extends BaseDaoImpl<OrderEntity> implements OrderDao{
         super(entityManager);
     }
 
-    public OrderEntity findByOrderId(String orderId)
+    public OrderEntity findByUid(String orderId)
     {
-        String queryString = "select object(o) from OrderEntity o where o.uid='" + orderId + "'";
-        Query query = entityManager.createQuery(queryString);
+        Query query = entityManager.createQuery("select object(o) from OrderEntity o where o.uid=:id");
+        query.setParameter("id", orderId);
 
         OrderEntity orderEntity = null;
         try

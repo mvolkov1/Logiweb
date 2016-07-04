@@ -17,8 +17,6 @@ import java.util.List;
  */
 public class UserService {
 
-    private UserDao userDao = new UserDaoImpl(TransactionManager.getEntityManager());
-
 
     private void addUser(String login, String password, String role, String firstName, String lastName) {
         try {
@@ -30,7 +28,7 @@ public class UserService {
             userEntity.setRole(role);
             userEntity.setFirstName(firstName);
             userEntity.setLastName(lastName);
-            userDao.save(userEntity);
+            new UserDaoImpl(TransactionManager.getEntityManager()).save(userEntity);
             TransactionManager.commit();
         } catch (Exception e) {
             TransactionManager.rollback();
@@ -41,35 +39,28 @@ public class UserService {
         addUser(login, password, role, firstName, lastName);
     }
 
-    public void handleLoginPassword(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String login = request.getParameter("login");
-        String password = request.getParameter("pass");
-        if (login != null && password != null) {
-            String address = null;
-            try {
-                TransactionManager.beginTransaction();
-                UserEntity userEntity = userDao.findByLogin(login);
-                if (userEntity != null && userEntity.getPassword().equals(password)) {
-                    request.setAttribute("lastName", userEntity.getLastName());
-                    request.setAttribute("firstName", userEntity.getFirstName());
-                    if (userEntity.getRole().equals("manager")) {
-                        address = "/WEB-INF/jsp/managerView.jsp";
-                    } else if (userEntity.getRole().equals("driver")) {
-                        address = "/WEB-INF/jsp/driverView.jsp";
-                    }
-                } else {
-                    address = "/WEB-INF/jsp/login.jsp";
+    public static String handleLoginPassword(String login, String password, StringBuilder firstName, StringBuilder lastName) {
+        String address = null;
+        try {
+            TransactionManager.beginTransaction();
+            UserEntity userEntity = new UserDaoImpl(TransactionManager.getEntityManager()).findByLogin(login);
+            if (userEntity != null && userEntity.getPassword().equals(password)) {
+                firstName.append(new StringBuilder(userEntity.getFirstName()));
+                lastName.append(new StringBuilder(userEntity.getLastName()));
+                if (userEntity.getRole().equals("manager")) {
+                    address = "/WEB-INF/jsp/managerView.jsp";
+                } else if (userEntity.getRole().equals("driver")) {
+                    address = "/WEB-INF/jsp/driverView.jsp";
                 }
-                TransactionManager.commit();
-            } catch (Exception e) {
-                TransactionManager.rollback();
-                address = "/WEB-INF/jsp/login.jsp";
+            } else {
+                address = "login.jsp";
             }
-            request.getRequestDispatcher(address).forward(request, response);
-        } else {
-            request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+            TransactionManager.commit();
+        } catch (Exception e) {
+            TransactionManager.rollback();
+            address = "/WEB-INF/jsp/login.jsp";
         }
+        return address;
     }
 
 }

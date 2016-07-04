@@ -50,28 +50,14 @@
                     <a href="order?orderId=${driver.order.uid}"> ${driver.order.uid}</a>
                 </td>
                 <td align="center">
-                    <form>
+                    <form action="editDriver" method="get">
                         <input type="submit" value="Edit" class="buttonInCell">
-                        <input type="hidden" name="editDriver" value="true">
-                        <input type="hidden" name="uid" value=${driver.uid}>
-                    </form>
-                </td>
-                <td align="center">
-                    <form onsubmit="return confirmDelete()">
-                        <input type="submit" value="Delete" class="buttonInCell">
-                        <input type="hidden" name="deleteDriver" value="true">
                         <input type="hidden" name="uid" value=${driver.uid}>
                     </form>
                 </td>
             </tr>
         </c:forEach>
     </table>
-    <%--<p>--%>
-    <%--<form>--%>
-        <%--<input type="submit" value="Add new driver" class="editOrDelete">--%>
-        <%--<input type="hidden" name="newDriver" value="true">--%>
-    <%--</form>--%>
-    <%--</p>--%>
 
 </div>
 <br>

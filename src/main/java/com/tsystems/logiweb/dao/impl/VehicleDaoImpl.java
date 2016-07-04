@@ -1,13 +1,13 @@
 package com.tsystems.logiweb.dao.impl;
 
 import com.tsystems.logiweb.dao.api.VehicleDao;
-import com.tsystems.logiweb.dao.entity.CityEntity;
-import com.tsystems.logiweb.dao.entity.OrderEntity;
-import com.tsystems.logiweb.dao.entity.VehicleEntity;
+import com.tsystems.logiweb.dao.entity.*;
+import com.tsystems.logiweb.services.TransactionManager;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -16,143 +16,68 @@ import java.util.List;
  */
 public class VehicleDaoImpl extends BaseDaoImpl<VehicleEntity> implements VehicleDao {
 
-    public VehicleDaoImpl(EntityManager entityManager)
-    {
+    public VehicleDaoImpl(EntityManager entityManager) {
         super(entityManager);
     }
 
-    public VehicleEntity findById(String id) {
-        return entityManager.find(VehicleEntity.class, id);
-    }
 
-    public VehicleEntity findByVin(String vin){
+    public VehicleEntity findByVin(String vin) {
 
         Query query = entityManager.createQuery(
                 "select object(v) from VehicleEntity v where v.vin = :vin"
         );
         query.setParameter("vin", vin);
         VehicleEntity vehicleEntity = null;
-        try
-        {
+        try {
             vehicleEntity = (VehicleEntity) query.getSingleResult();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             vehicleEntity = null;
         }
         return vehicleEntity;
     }
 
-    public void deleteByVin(String vin)
-    {
+    public void deleteByVin(String vin) {
         VehicleEntity vehicleEntity = findByVin(vin);
-        entityManager.remove(vehicleEntity);
-    }
-
-
-    public void setAvailable(VehicleEntity vehicle, boolean isAvailable) {
-        Query query = entityManager.createQuery("update VehicleEntity v set v.isAvailable = :b where v.id = :id");
-        query.setParameter("b", isAvailable ? 1 : 0);
-        query.setParameter("id", vehicle.getId());
         try {
-            query.executeUpdate();
+            this.remove(vehicleEntity);
         } catch (Exception e) {
-          //  throw new LogiwebDaoException("adsfads", e);
+            throw e;
         }
     }
 
-    public void setCity(VehicleEntity vehicle, String city){
-        Query query = entityManager.createQuery("update VehicleEntity v set v.city = :city where v.id = :id");
-        query.setParameter("city", city);
-        query.setParameter("id", vehicle.getId());
-        query.executeUpdate();
-    }
 
-    public void setOrder(VehicleEntity vehicle, OrderEntity order) {
-        Query query = entityManager.createQuery("update VehicleEntity v set v.order = :order where v.id = :id");
-        query.setParameter("order", order);
-        query.setParameter("id", vehicle.getId());
-        query.executeUpdate();
-    }
+    public List<VehicleEntity> getListOfVehiclesForOrder(OrderEntity orderEntity) {
 
-    public void setCapacity(VehicleEntity vehicle, String capacity){
-        Query query = entityManager.createQuery("update VehicleEntity v set v.capacity = :capacity where v.id = :id");
-        query.setParameter("capacity", capacity);
-        query.setParameter("id", vehicle.getId());
-        query.executeUpdate();
-    }
+        VehicleDao vehicleDao = new VehicleDaoImpl(TransactionManager.getEntityManager());
+        List<VehicleEntity> vehiclesForOrder = new ArrayList<VehicleEntity>();
+        List<OrderItemEntity> items = (List<OrderItemEntity>) orderEntity.getOrderItems();
+        List<CargoEntity> cargos = (List<CargoEntity>) orderEntity.getCargos();
+        List<VehicleEntity> vehicles = vehicleDao.getAllEntities(VehicleEntity.class);
 
-    public void setNumberOfDrivers(VehicleEntity vehicle, String numberOfDrivers){
-        Query query = entityManager.createQuery("update VehicleEntity v set v.numberOfDrivers = :numberOfDrivers where v.id = :id");
-        query.setParameter("numberOfDrivers", numberOfDrivers);
-        query.setParameter("id", vehicle.getId());
-        query.executeUpdate();
-    }
+        for (VehicleEntity v : vehicles) {
+            if (v.getOrder() != null) continue;
+            boolean isGood = true;
 
-    public void updateVehicle(VehicleEntity vehicle, String vin, String capacity, String numberOfDrivers, String isAvailable,
-                              CityEntity city, OrderEntity order)
-    {
-        Query query = entityManager.createQuery("update VehicleEntity v"
-                + " set v.vin = :vin, "
-                + " v.capacity= :capacity, "
-                + " v.numberOfDrivers = :numberOfDrivers, "
-                + " v.isAvailable = :isAvailable, "
-                + " v.city = :city, "
-                + " v.order = :order "
-                + " where v.id = :id");
-        query.setParameter("id", vehicle.getId());
-        query.setParameter("vin", vin);
-        query.setParameter("capacity", new BigDecimal(capacity));
-        query.setParameter("numberOfDrivers", Integer.parseInt(numberOfDrivers));
-        query.setParameter("isAvailable", Short.parseShort(isAvailable));
-        query.setParameter("city", city);
-        query.setParameter("order", order);
+            for (OrderItemEntity oi : orderEntity.getOrderItems()) {
 
-        int updateCount = 0;
-        try
-        {
-            updateCount = query.executeUpdate();
+                BigDecimal massAtItem = new BigDecimal(0);
+                for (CargoEntity c : cargos) {
+                    if (c.getStartCity().getCity().equals(oi.getCity().getCity())) {
+                        massAtItem = massAtItem.add(c.getMass());
+                    }
+                }
+
+                if (massAtItem.compareTo(v.getCapacity()) > 0) {
+                    isGood = false;
+                    break;
+                }
+            }
+
+            if (isGood) {
+                vehiclesForOrder.add(v);
+            }
         }
-        catch (Exception e)
-        {
-
-        }
-    }
-
-    public void setOrderForVehicle(VehicleEntity vehicleEntity, OrderEntity orderEntity)
-    {
-        Query query = entityManager.createQuery("update VehicleEntity v"
-                + " set v.order = :order "
-                + " where v.id = :id");
-        query.setParameter("id", vehicleEntity.getId());
-        query.setParameter("order", orderEntity);
-
-        int updateCount = 0;
-        try
-        {
-            updateCount = query.executeUpdate();
-        }
-        catch (Exception e)
-        {
-
-        }
-    }
-
-    public List<VehicleEntity> getListOfVehiclesForOrder(String startCity, short capacity)
-    {
-        List<VehicleEntity> vehicles = null;
-        Query query = entityManager.createQuery("select object(v) from VehicleEntity v where ( v.order = null and v.isAvailable=1 and v.capacity > :capacity) ");
-        query.setParameter("capacity", capacity);
-        try {
-
-            vehicles = (List<VehicleEntity>) query.getResultList();
-        }
-        catch (Exception e)
-        {
-            vehicles = null;
-        }
-
-        return vehicles;
+        return vehiclesForOrder;
     }
 
 }

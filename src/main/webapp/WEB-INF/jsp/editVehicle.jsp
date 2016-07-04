@@ -37,7 +37,7 @@
 
 <div class="right">
 
-    <form onsubmit="return validateVehicleInput()">
+    <form onsubmit="return validateVehicleInput()" action="vehicles" method="post">
         <table>
             <caption><h1>Edit vehicle</h1></caption>
             <tr>
@@ -55,8 +55,9 @@
             <tr>
                 <td>City</td>
                 <td>
-                    <select name="city" class="edit">
+                    <select name="city" class="edit" id="city">
                         <c:forEach var="city1" items="${cities}">
+                            <option value="" disabled hidden  ${vehicleCity == null ? 'selected="selected"' : ''} >Select city...</option>
                             <option value="${city1.city}" ${city1.city == vehicleCity ? 'selected="selected"' : ''}>${city1.city}</option>
                         </c:forEach>
                     </select>
@@ -74,6 +75,7 @@
         </table>
         <input type="hidden" name="saveVehicle" value="true">
         <input type="submit" value="Save">
+        <input type="hidden" name="oldVin" value="${vin}">
 
     </form>
 

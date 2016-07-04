@@ -13,4 +13,7 @@ public interface BaseDao<T> {
     public List<T> getAllEntities(Class c);
     public int getNumberOfEntities(Class c);
     public void setEntityManager(EntityManager entityManager);
+    public void merge(T t);
+    public void remove(T t);
+    public void flush();
 }

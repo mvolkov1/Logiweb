@@ -59,7 +59,7 @@ public class DriverEntity {
         this.status = status;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "orderId", referencedColumnName = "id")
     public OrderEntity getOrder() {
         return order;
@@ -69,7 +69,7 @@ public class DriverEntity {
         this.order = order;
     }
 
-    @ManyToOne
+    @OneToOne//(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "cityId", referencedColumnName = "id", nullable = false)
     public CityEntity getCity() {
         return city;

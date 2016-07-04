@@ -44,26 +44,17 @@ public class TransactionManager {
     }
 
     public static void rollback() {
-        getEntityManager().getTransaction().rollback();
+        if (getEntityManager().getTransaction().isActive())
+            getEntityManager().getTransaction().rollback();
     }
 
     public static void commit() {
         getEntityManager().getTransaction().commit();
+//        getEntityManager().flush();
+        getEntityManager().clear();
     }
 
-    public static boolean isActive() {
-        return getEntityManager().getTransaction().isActive();
-    }
 
 
-//    public void commitTransaction() {
-//        entityManager.getTransaction().commit();
-//    }
-//
-//    public void rollbackTransaction() {
-//        if (entityManager.getTransaction().isActive()) {
-//            entityManager.getTransaction().rollback();
-//        }
-//    }
 
 }

@@ -31,7 +31,7 @@
 <div class="right">
 
     <h2><c:out value="Edit driver: ${firstName} ${lastName}"></c:out></h2>
-    <form onsubmit="return validateDriverInput()">
+    <form onsubmit="return validateDriverInput()" action="drivers" method="post" >
         <table>
             <tr>
                 <td>UID</td>
@@ -63,7 +63,9 @@
             </tr>
         </table>
         <input type="hidden" name="saveDriver" value="true">
+        <input type="hidden" name="oldUid" value="${uid}">
         <input type="submit" value="Save">
+
 
     </form>
 

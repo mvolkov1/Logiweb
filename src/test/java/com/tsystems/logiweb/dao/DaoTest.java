@@ -156,21 +156,21 @@ public class DaoTest {
 
 
     public void createVehicles() {
-        vehicleService.addVehicle("KF91284", 38f, 2, (short) 1, "Moscow");
-        vehicleService.addVehicle("AA23525", 35f, 1, (short) 1, "Moscow");
-        vehicleService.addVehicle("AS09125", 35f, 1, (short) 1, "Moscow");
-        vehicleService.addVehicle("PD23523", 38f, 2, (short) 1, "St Petersburg");
-        vehicleService.addVehicle("AP42342", 40f, 2, (short) 1, "St Petersburg");
-        vehicleService.addVehicle("SR32152", 35f, 2, (short) 1, "St Petersburg");
-        vehicleService.addVehicle("SA23532", 38f, 2, (short) 1, "Voronezh");
-        vehicleService.addVehicle("FF32523", 35f, 1, (short) 1, "Voronezh");
-        vehicleService.addVehicle("JF41243", 35f, 1, (short) 1, "Kazan");
-        vehicleService.addVehicle("KF32462", 35f, 1, (short) 1, "Nizhny Novgorod");
-        vehicleService.addVehicle("DS23152", 40f, 2, (short) 1, "Nizhny Novgorod");
-        vehicleService.addVehicle("RT32432", 35f, 1, (short) 1, "Samara");
-        vehicleService.addVehicle("KG23423", 38f, 2, (short) 1, "Samara");
-        vehicleService.addVehicle("DG19241", 35f, 1, (short) 1, "Samara");
-        vehicleService.addVehicle("WE71474", 35f, 1, (short) 1, "Vologda");
+        vehicleService.createVehicle("KF91284", 38f, 2, (short) 1, "Moscow");
+        vehicleService.createVehicle("AA23525", 35f, 1, (short) 1, "Moscow");
+        vehicleService.createVehicle("AS09125", 35f, 1, (short) 1, "Moscow");
+        vehicleService.createVehicle("PD23523", 38f, 2, (short) 1, "St Petersburg");
+        vehicleService.createVehicle("AP42342", 40f, 2, (short) 1, "St Petersburg");
+        vehicleService.createVehicle("SR32152", 35f, 2, (short) 1, "St Petersburg");
+        vehicleService.createVehicle("SA23532", 38f, 2, (short) 1, "Voronezh");
+        vehicleService.createVehicle("FF32523", 35f, 1, (short) 1, "Voronezh");
+        vehicleService.createVehicle("JF41243", 35f, 1, (short) 1, "Kazan");
+        vehicleService.createVehicle("KF32462", 35f, 1, (short) 1, "Nizhny Novgorod");
+        vehicleService.createVehicle("DS23152", 40f, 2, (short) 1, "Nizhny Novgorod");
+        vehicleService.createVehicle("RT32432", 35f, 1, (short) 1, "Samara");
+        vehicleService.createVehicle("KG23423", 38f, 2, (short) 1, "Samara");
+        vehicleService.createVehicle("DG19241", 35f, 1, (short) 1, "Samara");
+        vehicleService.createVehicle("WE71474", 35f, 1, (short) 1, "Vologda");
     }
 
 //    public void checkVehicles()

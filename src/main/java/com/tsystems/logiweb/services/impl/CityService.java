@@ -18,7 +18,7 @@ public class CityService {
         try {
             TransactionManager.beginTransaction();
             CityEntity cityEntity = new CityEntity();
-            cityEntity.setCity(city);
+            cityEntity.setName(city);
             cityDao.save(cityEntity);
             TransactionManager.commit();
         } catch (Exception e) {

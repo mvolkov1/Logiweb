@@ -6,6 +6,14 @@ input.buttonInCell {
     width: 100%;
 }
 
+select.selectInCell {
+    width: 100%;
+}
+
+input.editInCell{
+    width: 100%;
+}
+
 input.buttonAddToTable {
     background-color: #4CAF50;
     border: none;

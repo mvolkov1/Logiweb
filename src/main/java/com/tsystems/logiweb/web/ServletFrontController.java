@@ -1,9 +1,6 @@
 package com.tsystems.logiweb.web;
 
-import com.tsystems.logiweb.dao.entity.CityEntity;
-import com.tsystems.logiweb.dao.entity.DriverEntity;
-import com.tsystems.logiweb.dao.entity.OrderEntity;
-import com.tsystems.logiweb.dao.entity.VehicleEntity;
+import com.tsystems.logiweb.dao.entity.*;
 import com.tsystems.logiweb.services.impl.*;
 
 import javax.servlet.ServletException;
@@ -11,9 +8,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -47,13 +45,9 @@ public class ServletFrontController extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
                 return;
             } else if (path.equals("/Logiweb/vehicles")) {
-                String deleteVehicle = request.getParameter("deleteVehicle");
                 String saveVehicle = request.getParameter("saveVehicle");
                 String vin = request.getParameter("vin");
                 if (vin != null && !vin.isEmpty()) {
-                    if (deleteVehicle != null && deleteVehicle.equals("true")) {
-                        VehicleService.deleteVehicle(vin);
-                    }
                     if (saveVehicle != null && saveVehicle.equals("true")) {
                         String capacity = request.getParameter("capacity");
                         String numberOfDrivers = request.getParameter("numberOfDrivers");
@@ -82,19 +76,38 @@ public class ServletFrontController extends HttpServlet {
             } else if (path.equals("/Logiweb/editOrder")) {
                 String uid = request.getParameter("uid");
                 String step = request.getParameter("step");
-                if (uid != null && !uid.isEmpty() && step != null) {
-                    if (step.equals("uid"))
-                    {
-                        OrderService.createOrder(uid);
+                if (uid != null && !uid.isEmpty()) {
+                    if (step != null) {
+                        if (step.equals("uid")) {
+                            OrderService.createOrder(uid);
+                        } else if (step.equals("item")) {
+                            String city = request.getParameter("city");
+                            OrderService.addItem(uid, city);
+                        } else if (step.equals("deleteItem")) {
+                            String itemNumber = request.getParameter("itemNumber");
+                            OrderService.deleteItem(uid, itemNumber);
+                        } else if (step.equals("cargo")) {
+                            String cargoUid = request.getParameter("cargoUid");
+                            String title = request.getParameter("cargoTitle");
+                            String mass = request.getParameter("cargoMass");
+                            String cargoItem1 = request.getParameter("cargoItem1");
+                            String cargoItem2 = request.getParameter("cargoItem2");
+                            String status = request.getParameter("status");
+                            OrderService.addCargo(uid, cargoUid, title, mass, cargoItem1, cargoItem2, status);
+                        } else if (step.equals("deleteCargo")) {
+                            String cargoUid = request.getParameter("cargoUid");
+                            OrderService.deleteCargo(uid, cargoUid);
+                        } else if (step.equals("vehicle")) {
+                            String vin = request.getParameter("vin");
+                            OrderService.setVehicle(uid, vin);
+                        } else if (step.equals("driver")) {
+                            String driverUid = request.getParameter("driverUid");
+                            OrderService.addDriver(uid, driverUid);
+                        }
                     }
-
-
                 }
                 response.sendRedirect("editOrder?uid=" + uid);
                 return;
-//                address = OrderService.handleEditOrder(request);
-//            } else if (path.equals("/Logiweb/editDriver")) {
-//                address = DriverService.handleEditDriver(request);
             } else {
                 request.setAttribute("path", path);
                 request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
@@ -116,6 +129,13 @@ public class ServletFrontController extends HttpServlet {
             if (path.equals("/Logiweb") || path.equals("/Logiweb/")) {
                 request.getRequestDispatcher("/login.jsp").forward(request, response);
             } else if (path.equals("/Logiweb/vehicles")) {
+                String deleteVehicle = request.getParameter("deleteVehicle");
+                String vin = request.getParameter("vin");
+                if (vin != null && !vin.isEmpty()) {
+                    if (deleteVehicle != null && deleteVehicle.equals("true")) {
+                        VehicleService.deleteVehicle(vin);
+                    }
+                }
                 List<VehicleEntity> vehicles = VehicleService.getListOfVehicles();
                 request.setAttribute("list", vehicles);
                 request.getRequestDispatcher("/WEB-INF/jsp/vehicles.jsp").forward(request, response);
@@ -160,18 +180,65 @@ public class ServletFrontController extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/jsp/editDriver.jsp").forward(request, response);
                 return;
             } else if (path.equals("/Logiweb/orders")) {
+                String uid = request.getParameter("uid");
+                String deleteOrder = request.getParameter("deleteOrder");
+                if (uid != null && !uid.isEmpty()) {
+                    if (deleteOrder != null && deleteOrder.equals("true")) {
+                        OrderService.deleteOrder(uid);
+                    }
+                }
                 List<OrderEntity> orders = OrderService.getListOfOrders();
                 request.setAttribute("list", orders);
                 request.getRequestDispatcher("/WEB-INF/jsp/orders.jsp").forward(request, response);
-            } else if (path.equals("/Logiweb/editOrder")) {
-                String uid = request.getParameter("uid");
-                if (uid != null && !uid.isEmpty()) {
-
-                }
-                request.getRequestDispatcher("/WEB-INF/jsp/editOrder.jsp").forward(request, response);
             } else {
-                request.setAttribute("path", path);
-                request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
+                if (path.equals("/Logiweb/editOrder")) {
+                    String uid = request.getParameter("uid");
+                    if (uid != null && !uid.isEmpty()) {
+                        OrderEntity orderEntity = OrderService.getOrder(uid);
+                        if (orderEntity == null)
+                            return;
+                        request.setAttribute("uid", uid);
+                        Set<CityEntity> cities = OrderService.getListOfCities(uid);
+                        request.setAttribute("cities", cities);
+                        List<OrderItemEntity> items = OrderService.getListOfItems(uid);
+                        request.setAttribute("items", items);
+                        List<String> itemNumbers = new ArrayList<>();
+                        for (int i = 1; i <= orderEntity.getItems().size(); i++) {
+                            itemNumbers.add(Integer.toString(i));
+                        }
+                        request.setAttribute("itemNumbers", itemNumbers);
+                        List<CargoEntity> cargoes = OrderService.getListOfCargoes(uid);
+                        request.setAttribute("cargoes", cargoes);
+                        List<String> statusList = new ArrayList<>();
+                        statusList.add("Prepared");
+                        statusList.add("Loaded");
+                        statusList.add("Delivered");
+                        request.setAttribute("statusList", statusList);
+                        request.setAttribute("nextItemNumber", orderEntity.getItems().size() + 1);
+                        int nItems = orderEntity.getItems().size();
+                        if (nItems > 0) {
+                            OrderItemEntity lastItem = ((List<OrderItemEntity>) orderEntity.getItems()).get(nItems - 1);
+                            CityEntity lastCity = lastItem.getCity();
+                            cities.remove(lastCity);
+                        }
+                        List<VehicleEntity> vehicles = OrderService.getListOfVehicles(uid);
+                        request.setAttribute("vehicles", vehicles);
+                        VehicleEntity vehicle = orderEntity.getVehicle();
+                        if (vehicle != null) {
+                            request.setAttribute("vehicleVin", vehicle.getVin());
+                        }
+                        List<DriverEntity> possibleDrivers = OrderService.getListOfPossibleDrivers(uid);
+                        request.setAttribute("possibleDrivers", possibleDrivers);
+                        List<DriverEntity> drivers = OrderService.getListOfDrivers(uid);
+                        request.setAttribute("drivers", drivers);
+                    }
+
+
+                    request.getRequestDispatcher("/WEB-INF/jsp/editOrder.jsp").forward(request, response);
+                } else {
+                    request.setAttribute("path", path);
+                    request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
+                }
             }
             if (address != null) {
                 request.getRequestDispatcher(address).forward(request, response);

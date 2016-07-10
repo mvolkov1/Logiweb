@@ -30,9 +30,9 @@
 
 <div class="right">
 
-    <h2><c:out value="Edit driver: ${firstName} ${lastName}"></c:out></h2>
     <form onsubmit="return validateDriverInput()" action="drivers" method="post" >
         <table>
+            <caption><h3>Edit driver: ${firstName} ${lastName} </h3></caption>
             <tr>
                 <td>UID</td>
                 <td><input type="text" name="uid" id="uid" value="${uid}"></td>
@@ -46,7 +46,7 @@
                 <td>
                     <select name="city" class="edit">
                         <c:forEach var="city1" items="${cities}">
-                            <option value="${city1.city}" ${city1.city == driverCity ? 'selected="selected"' : ''}>${city1.city}</option>
+                            <option value="${city1.name}" ${city1.name == driverCity ? 'selected="selected"' : ''}>${city1.name}</option>
                         </c:forEach>
                     </select>
                 </td>

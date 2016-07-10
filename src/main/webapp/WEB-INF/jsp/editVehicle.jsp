@@ -58,7 +58,7 @@
                     <select name="city" class="edit" id="city">
                         <c:forEach var="city1" items="${cities}">
                             <option value="" disabled hidden  ${vehicleCity == null ? 'selected="selected"' : ''} >Select city...</option>
-                            <option value="${city1.city}" ${city1.city == vehicleCity ? 'selected="selected"' : ''}>${city1.city}</option>
+                            <option value="${city1.name}" ${city1.name == vehicleCity ? 'selected="selected"' : ''}>${city1.name}</option>
                         </c:forEach>
                     </select>
                 </td>

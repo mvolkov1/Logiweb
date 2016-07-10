@@ -31,229 +31,221 @@
 
 <!-- Site navigation menu -->
 <ul class="navbar">
-    <li><a href="vehicles">vehicles</a></li>
-    <li><a href="drivers">drivers</a></li>
-    <li><a href="orders" class="active">orders</a></li>
+    <li><a href="vehicles">Vehicles</a></li>
+    <li><a href="drivers">Drivers</a></li>
+    <li><a href="orders" class="active">Orders</a></li>
 </ul>
 
 <div class="right">
 
-    <form action="editOrder" method="post" onsubmit="return validateOrderInput()">
 
-        <table class="newOrderTable">
+    <form action="editOrder" method="post" onsubmit="return validateUid()">
+        <h4>Order UID</h4>
+        <input type="text" name="uid" value="${uid}" id="uid" placeholder="enter UID">
+        <input type="submit" value="Save" class="buttonSingle">
+        <input type="hidden" name="oldUid" value="${uid}">
+        <input type="hidden" name="step" value="uid">
+    </form>
+    <br>
+
+    <h4>Order items</h4>
+    <table class="editOrderTable" id="itemsTable">
+        <th>Item</th>
+        <th>City</th>
+        <th>Distance</th>
+        <th>Full distance</th>
+        <c:forEach var="item" items="${items}">
             <tr>
+                <td style="width:8ch"> ${item.itemNumber} </td>
+                <td> ${item.city.name} </td>
+                <td>${item.distance}</td>
+                <td>${item.fullDistance}</td>
                 <td>
-                    <h4>Order UID1</h4>
-                    <input type="text" name="uid" value="${uid}" id="uid" placeholder="enter UID">
-                    <input type="submit" value="Save" class="buttonSingle">
-                    <input type="hidden" name="step" value="uid">
-                    <input type="hidden" name="oldUid" value="${uid}">
-                    <%--</form>--%>
-                    <%--</c:if>--%>
-                    <%--<c:if test="${not empty uid}">--%>
-                    <%--<h4>Order # ${uid}</h4>--%>
-                    <%--</c:if>--%>
-
+                    <c:if test="${item.itemNumber eq items.size()}">
+                    <form action="editOrder" method="post" onsubmit="return confirmDeleteItem()">
+                        <input type="submit" value="Delete" class="buttonInCell">
+                        <input type="hidden" name="step" value="deleteItem">
+                        <input type="hidden" name="itemNumber" value="${item.itemNumber}">
+                        <input type="hidden" name="uid" value="${uid}">
+                    </form>
+                    </c:if>
                 </td>
             </tr>
-
-            <%--<c:if test="${not empty uid}">--%>
-            <tr>
+        </c:forEach>
+        <tr>
+            <form action="editOrder" method="post" onsubmit="return validateItem()">
                 <td>
-                    <h4>Order items</h4>
-                    <c:if test="${fn:length(items) > 0}">
-                        <table class="resultTable" id="itemsTable">
-                            <th>Item number</th>
-                            <th>City</th>
-                            <c:forEach var="item" items="${items}">
-                                <tr>
-                                    <td> ${item.itemNumber} </td>
-                                    <td> ${item.city.city} </td>
-                                </tr>
-                            </c:forEach>
-                        </table>
-                    </c:if>
-                    <c:if test="${empty items}">
-                        No items found in the database for this order
-                    </c:if>
-                    <br>
-                    <select name="city" id="city">
+                    <input type="text" readonly="readonly" placeholder="${nextItemNumber}"
+                           class="editInCell">
+                </td>
+                <td>
+                    <select name="city" id="city" class="selectInCell">
                         <option value="" disabled selected hidden>Select city...</option>
                         <c:forEach var="city1" items="${cities}">
-                            <option value="${city1.city}">${city1.city}</option>
+                            <option value="${city1.name}">${city1.name}</option>
                         </c:forEach>
                     </select>
-                    <input type="submit" value="Add order item" class="buttonSingle">
-                    <input type="hidden" name="saveOrderItem" value="true">
+                </td>
+                <td></td>
+                <td></td>
+                <td>
+                    <input type="submit" name="addItem" value="Add order item" class="buttonInCell">
+                    <input type="hidden" name="uid" value="${uid}">
+                    <input type="hidden" name="step" value="item">
+                </td>
+            </form>
+        </tr>
+    </table>
+    <br>
+
+
+    <h4>Cargoes</h4>
+    <table class="editOrderTable" id="cargoesTable">
+        <th style="width:15ch">UID</th>
+        <th>Title</th>
+        <th style="width:8ch">Mass</th>
+        <th style="width:10ch">From item</th>
+        <th style="width:10ch">To item</th>
+        <th>Status</th>
+        <c:forEach var="cargo" items="${cargoes}">
+            <tr>
+                <td> ${cargo.uid} </td>
+                <td> ${cargo.title} </td>
+                <td> ${cargo.mass} </td>
+                <td> ${cargo.itemStart.itemNumber} </td>
+                <td> ${cargo.itemEnd.itemNumber} </td>
+                <td>${cargo.status}</td>
+                <td align="center">
+                    <form action="editOrder" method="post" onsubmit="return confirmDeleteCargo()">
+                        <input type="submit" value="Delete" class="buttonInCell">
+                        <input type="hidden" name="step" value="deleteCargo">
+                        <input type="hidden" name="cargoUid" value="${cargo.uid}">
+                        <input type="hidden" name="uid" value="${uid}">
+                    </form>
                 </td>
             </tr>
+        </c:forEach>
+        <tr>
+            <form action="editOrder" method="post" onsubmit="return validateCargo()">
+                <td><input type="text" name="cargoUid" id="cargoUid"
+                           placeholder="Cargo ID" class="editInCell">
+                </td>
+                <td><input type="text" name="cargoTitle" id="cargoTitle"
+                           placeholder="Title" class="editInCell">
+                </td>
+                <td><input type="text" name="cargoMass" id="cargoMass"
+                           placeholder="Mass" class="editInCell">
+                </td>
+                <td><select name="cargoItem1" id="cargoItem1" class="selectInCell">
+                    </option>
+                    <c:forEach var="item1" items="${itemNumbers}">
+                        <option value="${item1}">${item1}</option>
+                    </c:forEach>
+                </select></td>
+                <td><select name="cargoItem2" id="cargoItem2" class="selectInCell">
+                    </option>
+                    <c:forEach var="item2" items="${itemNumbers}">
+                        <option value="${item2}">${item2}</option>
+                    </c:forEach>
+                </select></td>
+                <td><select name="status" id="status" class="selectInCell">
+                    </option>
+                    <c:forEach var="status" items="${statusList}">
+                        <option value="${status}" ${status.equals("Prepared")? 'selected="selected"' : ''}>${status}</option>
+                    </c:forEach>
+                </select></td>
+                <td>
+                    <input type="submit" value="Add cargo" class="buttonInCell">
+                    <input type="hidden" name="uid" value="${uid}">
+                    <input type="hidden" name="step" value="cargo">
+                </td>
+            </form>
+        </tr>
+    </table>
+    <br>
 
 
-            <%--<c:if test="${not empty hasItems}">--%>
-            <%--<tr>--%>
-            <%--<td>--%>
-            <%--<h4>Cargos</h4>--%>
-            <%--<c:if test="${fn:length(cargos) > 0}">--%>
-            <%--<table class="resultTable" id="cargosTable">--%>
-            <%--&lt;%&ndash;<caption></caption>&ndash;%&gt;--%>
-            <%--<th>Id</th>--%>
-            <%--<th>Title</th>--%>
-            <%--<th>Mass</th>--%>
-            <%--<th>Start city</th>--%>
-            <%--<th>End City</th>--%>
-            <%--<c:forEach var="cargo" items="${cargos}">--%>
-            <%--<tr>--%>
-            <%--<td> ${cargo.uid} </td>--%>
-            <%--<td> ${cargo.title} </td>--%>
-            <%--<td> ${cargo.mass} </td>--%>
-            <%--<td> ${cargo.startCity.city} </td>--%>
-            <%--<td> ${cargo.endCity.city} </td>--%>
-            <%--&lt;%&ndash;private String status;&ndash;%&gt;--%>
-            <%--</tr>--%>
-            <%--</c:forEach>--%>
-            <%--</table>--%>
-            <%--</c:if>--%>
-            <%--<c:if test="${empty items}">--%>
-            <%--No cargos found in the database for this order--%>
-            <%--</c:if>--%>
-            <%--<br>--%>
-            <%--<c:if test="${empty vehicle}">--%>
-            <%--<table>--%>
-            <%--<tr>--%>
-            <%--<form action="newOrder" method="post" onsubmit="return onAddCargo()">--%>
-            <%--<td>--%>
-            <%--<table class="cargoTable">--%>
-            <%--<tr>--%>
-            <%--<td><input type="text" name="cargoId" id="cargoId"--%>
-            <%--placeholder="Cargo ID">--%>
-            <%--</td>--%>
-            <%--</tr>--%>
-            <%--<tr>--%>
-            <%--<td><input type="text" name="cargoTitle" id="cargoTitle"--%>
-            <%--placeholder="Title">--%>
-            <%--</td>--%>
-            <%--</tr>--%>
-            <%--<tr>--%>
-            <%--<td><input type="text" name="cargoMass" id="cargoMass"--%>
-            <%--placeholder="Mass">--%>
-            <%--</td>--%>
-            <%--</tr>--%>
-            <%--<tr>--%>
-            <%--<td><select name="cargoCity1" id="cargoCity1" class="edit">--%>
-            <%--<option value="" disabled selected hidden>Select start city...--%>
-            <%--</option>--%>
-            <%--<c:forEach var="city1" items="${assignedCities}">--%>
-            <%--<option value="${city1.city}">${city1.city}</option>--%>
-            <%--</c:forEach>--%>
-            <%--</select></td>--%>
-            <%--</tr>--%>
-            <%--<tr>--%>
-            <%--<td><select name="cargoCity2" id="cargoCity2" class="edit">--%>
-            <%--<option value="" disabled selected hidden>Select end city...--%>
-            <%--</option>--%>
-            <%--<c:forEach var="city2" items="${assignedCities}">--%>
-            <%--<option value="${city2.city}">${city2.city}</option>--%>
-            <%--</c:forEach>--%>
-            <%--</select></td>--%>
-            <%--</tr>--%>
-            <%--</table>--%>
-
-            <%--</td>--%>
-            <%--<td>--%>
-            <%--<input type="submit" value="Add cargo" class="buttonSingle">--%>
-            <%--<input type="hidden" name="editOrder" value="true">--%>
-            <%--<input type="hidden" name="saveCargo" value="true">--%>
-            <%--<input type="hidden" name="uid" value="${uid}">--%>
-            <%--</td>--%>
-            <%--</form>--%>
-            <%--</tr>--%>
-            <%--</table>--%>
-            <%--</c:if>--%>
-
-            <%--</td>--%>
-            <%--</tr>--%>
-
-            <%--<c:if test="${not empty hasCargos}">--%>
-            <%--<tr>--%>
-            <%--<td>--%>
-            <%--<h4>Vehicle</h4>--%>
-            <%--<c:if test="${empty vehicle}">--%>
-            <%--<form action="newOrder" method="post" onsubmit="return onSetVehicle()">--%>
-            <%--<select name="vin" id="orderVehicle">--%>
-            <%--<option value="" disabled selected hidden>Select vehicle...</option>--%>
-            <%--<c:forEach var="vehicle1" items="${vehicles}">--%>
-            <%--<option value="${vehicle1.vin}">--%>
-            <%--${vehicle1.vin}; number of drivers = ${vehicle1.numberOfDrivers};--%>
-            <%--capacity--%>
-            <%--= ${vehicle1.capacity}--%>
-            <%--</option>--%>
-            <%--</c:forEach>--%>
-            <%--</select>--%>
-            <%--<input type="submit" value="Set vehicle" class="buttonSingle">--%>
-            <%--<input type="hidden" name="editOrder" value="true">--%>
-            <%--<input type="hidden" name="saveVehicle" value="true">--%>
-            <%--<input type="hidden" name="uid" value="${uid}">--%>
-            <%--</form>--%>
-            <%--</c:if>--%>
-            <%--<c:if test="${not empty vehicle}">--%>
-            <%--<c:out value="${vehicle.vin}; number of drivers = ${vehicle.numberOfDrivers}; capacity--%>
-            <%--= ${vehicle.capacity}"></c:out>--%>
-            <%--</c:if>--%>
-            <%--</td>--%>
-            <%--</tr>--%>
-
-            <%--<c:if test="${not empty vehicle}">--%>
-            <%--<tr>--%>
-            <%--<td>--%>
-            <%--<h4>Drivers</h4>--%>
-            <%--<c:if test="${fn:length(assignedDrivers) > 0}">--%>
-            <%--<table class="resultTable">--%>
-            <%--<th>UID</th>--%>
-            <%--<th>Name</th>--%>
-            <%--<c:forEach var="driver1" items="${assignedDrivers}">--%>
-            <%--<tr>--%>
-            <%--<td> ${driver1.uid} </td>--%>
-            <%--<td><c:out--%>
-            <%--value="${driver1.user.firstName} ${driver1.user.lastName}"></c:out></td>--%>
-            <%--</tr>--%>
-            <%--</c:forEach>--%>
-            <%--</table>--%>
-            <%--</c:if>--%>
-            <%--<c:if test="${empty assignedDrivers}">--%>
-            <%--No drivers assigned for this order--%>
-            <%--</c:if>--%>
-            <%--<br>--%>
-
-            <%--<c:if test="${empty orderCompletlyCreated}">--%>
-            <%--<form action="newOrder" method="post" onsubmit="return onAddDriver()">--%>
-            <%--<select name="driverUid" id="driverUid">--%>
-            <%--<option value="" disabled selected hidden>Select driver...</option>--%>
-            <%--<c:forEach var="driver" items="${drivers}">--%>
-            <%--<option value="${driver.uid}">--%>
-            <%--<c:out value="uid=${driver.uid}, ${driver.user.firstName} ${driver.user.lastName}, monthHours = ${driver.monthHours}"></c:out>--%>
-            <%--</option>--%>
-            <%--</c:forEach>--%>
-            <%--</select>--%>
-            <%--<input type="submit" value="Add driver" class="buttonSingle">--%>
-            <%--<input type="hidden" name="editOrder" value="true">--%>
-            <%--<input type="hidden" name="saveDriver" value="true">--%>
-            <%--<input type="hidden" name="uid" value="${uid}">--%>
-            <%--</form>--%>
-            <%--</c:if>--%>
-            <%--</td>--%>
-            <%--</tr>--%>
-            <%--</c:if>--%>
-            <%--</c:if>--%>
-            <%--</c:if>--%>
-            <%--</c:if>--%>
-
-        </table>
-
+    <h4>Vehicle</h4>
+    <form action="editOrder" method="post">
+        <select name="vin" id="vin">
+            <option value="" disabled selected hidden>Select vehicle...</option>
+            <c:forEach var="vehicle1" items="${vehicles}">
+                <option value="${vehicle1.vin}" ${vehicle1.vin.equals(vehicleVin)? 'selected="selected"' : ''}>
+                        ${vehicle1.vin}; number of drivers = ${vehicle1.numberOfDrivers};
+                    capacity
+                    = ${vehicle1.capacity}
+                </option>
+            </c:forEach>
+        </select>
+        <input type="submit" value="Set vehicle" class="buttonSingle">
+        <input type="hidden" name="uid" value="${uid}">
+        <input type="hidden" name="step" value="vehicle">
     </form>
+    <br>
+
+
+    <h4>Drivers</h4>
+    <table class="editOrderTable">
+        <%--<th>Driver</th>--%>
+        <c:forEach var="driver1" items="${drivers}">
+            <tr>
+                <td>
+                    <c:out value="${driver1.user.firstName} ${driver1.user.lastName} (${driver1.uid})"></c:out>
+                </td>
+                <td align="center" method="post">
+                    <form action="editOrder" method="post" onsubmit="return confirmDeleteCargo()">
+                        <input type="submit" value="Delete" class="buttonInCell">
+                        <input type="hidden" name="step" value="deleteDriver">
+                        <input type="hidden" name="driverUid" value="${driver1.uid}">
+                        <input type="hidden" name="uid" value="${uid}">
+                    </form>
+                </td>
+            </tr>
+        </c:forEach>
+        <tr>
+            <form method="post">
+                <td>
+                    <select name="driverUid" id="driverUid">
+                        <option value="" disabled selected hidden>Select driver...</option>
+                        <c:forEach var="driver1" items="${possibleDrivers}">
+                            <option value="${driver1.uid}">
+                                    ${driver1.user.firstName} ${driver1.user.lastName} (${driver1.uid})
+                            </option>
+                        </c:forEach>
+                    </select>
+                </td>
+                <td>
+                    <input type="submit" value="Add driver" class="buttonInCell">
+                    <input type="hidden" name="uid" value="${uid}">
+                    <input type="hidden" name="step" value="driver">
+                </td>
+            </form>
+        </tr>
+
+
+        <%--<c:if test="${empty orderCompletlyCreated}">--%>
+        <%--<form action="newOrder" method="post" onsubmit="return onAddDriver()">--%>
+        <%--<select name="driverUid" id="driverUid">--%>
+        <%--<option value="" disabled selected hidden>Select driver...</option>--%>
+        <%--<c:forEach var="driver" items="${drivers}">--%>
+        <%--<option value="${driver.uid}">--%>
+        <%--<c:out value="uid=${driver.uid}, ${driver.user.firstName} ${driver.user.lastName}, monthHours = ${driver.monthHours}"></c:out>--%>
+        <%--</option>--%>
+        <%--</c:forEach>--%>
+        <%--</select>--%>
+        <%--<input type="submit" value="Add driver" class="buttonSingle">--%>
+        <%--<input type="hidden" name="editOrder" value="true">--%>
+        <%--<input type="hidden" name="saveDriver" value="true">--%>
+        <%--<input type="hidden" name="uid" value="${uid}">--%>
+        <%--</form>--%>
+        <%--</c:if>--%>
+        <%--</td>--%>
+        </tr>
+
+
+    </table>
 
 
 </div>
-<br>
-<br>
 </body>
 </html>

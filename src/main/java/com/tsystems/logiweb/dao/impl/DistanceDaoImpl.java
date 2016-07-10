@@ -1,6 +1,7 @@
 package com.tsystems.logiweb.dao.impl;
 
 import com.tsystems.logiweb.dao.api.DistanceDao;
+import com.tsystems.logiweb.dao.entity.CityEntity;
 import com.tsystems.logiweb.dao.entity.DistanceEntity;
 
 import javax.persistence.*;
@@ -21,7 +22,7 @@ public class DistanceDaoImpl extends BaseDaoImpl<DistanceEntity> implements Dist
         return entityManager.find(DistanceEntity.class, id);
     }
 
-    public DistanceEntity findDistance(String city1, String city2){
+    public DistanceEntity findDistance(CityEntity city1, CityEntity city2){
 
         Query query = entityManager.createQuery(
                 "select object(d) from DistanceEntity d where d.city1 = :city1 and d.city2 = :city2"

@@ -14,6 +14,11 @@
     <style> <%@include file="../css/nav.css" %> </style>
     <style> <%@include file="../css/right.css" %> </style>
     <style> <%@include file="../css/buttons.css" %> </style>
+    <script>
+        function confirmDelete() {
+            return confirm("Delete order?");
+        }
+    </script>
 </head>
 <body>
 <!-- Site navigation menu -->
@@ -25,31 +30,21 @@
 
 
 <div class="right">
-    <c:if test="${fn:length(orders) > 0}">
+    <c:if test="${fn:length(list) > 0}">
         <table class="resultTable">
             <caption><h1>Orders</h1></caption>
             <th>ID</th>
             <th>Number of items</th>
-            <th>Number of cargos</th>
             <th>Vehicle</th>
             <th>Is completed</th>
-            <c:forEach var="order" items="${orders}">
+            <c:forEach var="order" items="${list}">
                 <tr>
-                    <td>
-
-                    <form action="editOrder" method="get">
-                        <input type="submit" value="${order.uid}" class="buttonInCell">
-                        <input type="hidden" name="uid" value=${order.uid}>
-                    </form>
-
-                    </td>
-                    <%--<td><a href="editOrder?uid=${order.uid}" class="tableRef"> ${order.uid}</a></td>--%>
-                    <td> ${order.orderItems.size()} </td>
-                    <td> ${order.cargos.size()} </td>
-                    <td> ${order.vehicle.vin}</td>
-                    <td> ${order.isCompleted} </td>
-                    <td align="center" method="get">
-                        <form onsubmit="return confirmDelete()">
+                    <td><a href="editOrder?uid=${order.uid}" class="tableRef"> ${order.uid}</a></td>
+                    <td> ${order.getItems().size()} </td>
+                    <td> ${order.getVehicleVin()}</td>
+                    <td> ${order.getIsCompleted()} </td>
+                    <td align="center" method="post">
+                        <form method="get" onsubmit="return confirmDelete()">
                             <input type="submit" value="Delete" class="buttonInCell">
                             <input type="hidden" name="deleteOrder" value="true">
                             <input type="hidden" name="uid" value=${order.uid}>
@@ -61,7 +56,7 @@
         <br>
     </c:if>
 
-    <c:if test="${empty orders}">
+    <c:if test="${empty list}">
         <h3>No orders found in the database</h3>
     </c:if>
 

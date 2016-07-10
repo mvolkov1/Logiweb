@@ -11,36 +11,39 @@ import javax.persistence.Query;
 /**
  * Created by mvolkov on 13.06.2016.
  */
-public class OrderDaoImpl extends BaseDaoImpl<OrderEntity> implements OrderDao{
+public class OrderDaoImpl extends BaseDaoImpl<OrderEntity> implements OrderDao {
 
-    public OrderDaoImpl(EntityManager entityManager)
-    {
+    public OrderDaoImpl(EntityManager entityManager) {
         super(entityManager);
     }
 
-    public OrderEntity findByUid(String orderId)
-    {
+    public OrderEntity findByUid(String orderId) {
         Query query = entityManager.createQuery("select object(o) from OrderEntity o where o.uid=:id");
         query.setParameter("id", orderId);
 
         OrderEntity orderEntity = null;
-        try
-        {
+        try {
             orderEntity = (OrderEntity) query.getSingleResult();
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             orderEntity = null;
         }
 
         return orderEntity;
     }
 
+    public void deleteByUid(String uid) {
+        OrderEntity orderEntity = this.findByUid(uid);
+        if (orderEntity != null) {
+            try {
+                this.remove(orderEntity);
+            } catch (Exception e) {
+                throw e;
+            }
+        }
+    }
 
 
-
-    public void updateOrder(OrderEntity orderEntity, String uid, String numberOfItems, String isCompleted)
-    {
+    public void updateOrder(OrderEntity orderEntity, String uid, String numberOfItems, String isCompleted) {
         Query query = entityManager.createQuery("update OrderEntity o"
                 + " set o.uid = :uid, "
                 + " o.numberOfItems= :numberOfItems, "
@@ -52,12 +55,9 @@ public class OrderDaoImpl extends BaseDaoImpl<OrderEntity> implements OrderDao{
         query.setParameter("isCompleted", Short.parseShort(isCompleted));
 
         int updateCount = 0;
-        try
-        {
+        try {
             updateCount = query.executeUpdate();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
 
         }
     }

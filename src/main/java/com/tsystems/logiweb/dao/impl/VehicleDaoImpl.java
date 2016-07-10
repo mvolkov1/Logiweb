@@ -50,7 +50,7 @@ public class VehicleDaoImpl extends BaseDaoImpl<VehicleEntity> implements Vehicl
 
         VehicleDao vehicleDao = new VehicleDaoImpl(TransactionManager.getEntityManager());
         List<VehicleEntity> vehiclesForOrder = new ArrayList<VehicleEntity>();
-        List<OrderItemEntity> items = (List<OrderItemEntity>) orderEntity.getOrderItems();
+        List<OrderItemEntity> items = (List<OrderItemEntity>) orderEntity.getItems();
         List<CargoEntity> cargos = (List<CargoEntity>) orderEntity.getCargos();
         List<VehicleEntity> vehicles = vehicleDao.getAllEntities(VehicleEntity.class);
 
@@ -58,11 +58,11 @@ public class VehicleDaoImpl extends BaseDaoImpl<VehicleEntity> implements Vehicl
             if (v.getOrder() != null) continue;
             boolean isGood = true;
 
-            for (OrderItemEntity oi : orderEntity.getOrderItems()) {
+            for (OrderItemEntity oi : orderEntity.getItems()) {
 
                 BigDecimal massAtItem = new BigDecimal(0);
                 for (CargoEntity c : cargos) {
-                    if (c.getStartCity().getCity().equals(oi.getCity().getCity())) {
+                    if (c.getItemStart().getCity().equals(oi.getCity().getName())) {
                         massAtItem = massAtItem.add(c.getMass());
                     }
                 }

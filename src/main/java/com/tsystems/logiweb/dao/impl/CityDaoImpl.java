@@ -22,7 +22,7 @@ public class CityDaoImpl extends BaseDaoImpl<CityEntity> implements CityDao {
     public CityEntity findByName(String name) {
 
         Query query = entityManager.createQuery(
-                "select object(c) from CityEntity c where c.city = :name"
+                "select object(c) from CityEntity c where c.name = :name"
         );
         query.setParameter("name", name);
         CityEntity cityEntity = null;

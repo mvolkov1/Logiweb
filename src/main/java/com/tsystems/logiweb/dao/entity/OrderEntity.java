@@ -3,7 +3,6 @@ package com.tsystems.logiweb.dao.entity;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by mvolkov on 12.06.2016.
@@ -15,17 +14,19 @@ public class OrderEntity {
     private long id;
     private String uid;
     private short isCompleted;
-    private int numberOfItems=0;
 
     private VehicleEntity vehicle;
-    private Collection<OrderItemEntity> orderItems = new ArrayList<>();
+    private Collection<OrderItemEntity> items = new ArrayList<>();
     private Collection<CargoEntity> cargos = new ArrayList<>();
     private Collection<DriverEntity> drivers = new ArrayList<>();
 
 
-    public OrderEntity(){super();}
+    public OrderEntity() {
+        super();
+    }
 
-    @Id@GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "id", nullable = false)
     public long getId() {
         return id;
@@ -55,22 +56,6 @@ public class OrderEntity {
         this.isCompleted = isCompleted;
     }
 
-    @Basic
-    @Column(name = "nItems", nullable = false)
-    public int getNumberOfItems() {return numberOfItems;}
-
-    public void setNumberOfItems(int numberOfItems) {this.numberOfItems = numberOfItems;}
-
-
-    @OneToMany(mappedBy = "order")
-    public Collection<CargoEntity> getCargos() {
-        return cargos;
-    }
-
-    public void setCargos(Collection<CargoEntity> cargos) {
-        this.cargos = cargos;
-    }
-
     @OneToMany(mappedBy = "order")
     public Collection<DriverEntity> getDrivers() {
         return drivers;
@@ -92,11 +77,32 @@ public class OrderEntity {
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
-    public Collection<OrderItemEntity> getOrderItems() {
-        return orderItems;
+    public Collection<CargoEntity> getCargos() {
+        return cargos;
     }
 
-    public void setOrderItems(Collection<OrderItemEntity> orderItems) {
-        this.orderItems = orderItems;
+    public void setCargos(Collection<CargoEntity> cargos) {
+        this.cargos = cargos;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
+    public Collection<OrderItemEntity> getItems() {
+        return items;
+    }
+
+    public void setItems(Collection<OrderItemEntity> orderItems) {
+        this.items = orderItems;
+    }
+
+    @Transient
+    public String getVehicleVin() {
+        String vehicleVin = null;
+        if (vehicle != null) {
+            vehicleVin = vehicle.getVin();
+            if (vehicleVin != null && !vehicleVin.isEmpty()) {
+                return vehicleVin;
+            }
+        }
+        return vehicleVin;
     }
 }

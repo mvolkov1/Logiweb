@@ -19,12 +19,9 @@ table.resultTable a:hover {
     color: white;
 }
 
-table.cargoTable{
 
-}
-
-table.cargoTable td {
-    border: none;
+table.editOrderTable td {
+    border: 1px solid #000;
     padding: 2px;
 }
 
@@ -33,6 +30,6 @@ table.newOrderTable{
 }
 
 table.newOrderTable td {
-    border: 1px solid #000;
+    /*border: 1px solid #000;*/
     padding: 2px;
 }

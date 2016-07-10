@@ -15,8 +15,8 @@ public class CargoEntity {
     private String title;
     private BigDecimal mass;
     private String status;
-    private CityEntity startCity;
-    private CityEntity endCity;
+    private OrderItemEntity itemStart;
+    private OrderItemEntity itemEnd;
     private OrderEntity order;
 
     @Id@GeneratedValue
@@ -71,28 +71,28 @@ public class CargoEntity {
     }
 
 
-    @ManyToOne
-    @JoinColumn(name = "cityIdStart", referencedColumnName = "id", nullable = false)
-    public CityEntity getStartCity() {
-        return startCity;
+    @OneToOne
+    @JoinColumn(name = "itemStartId", referencedColumnName = "id", nullable = false)
+    public OrderItemEntity getItemStart() {
+        return itemStart;
     }
 
-    public void setStartCity(CityEntity startCity) {
-        this.startCity = startCity;
+    public void setItemStart(OrderItemEntity itemStart) {
+        this.itemStart = itemStart;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "cityIdEnd", referencedColumnName = "id")
-    public CityEntity getEndCity() {
-        return endCity;
+    @OneToOne
+    @JoinColumn(name = "itemEndId", referencedColumnName = "id", nullable = false)
+    public OrderItemEntity getItemEnd() {
+        return itemEnd;
     }
 
-    public void setEndCity(CityEntity endCity) {
-        this.endCity = endCity;
+    public void setItemEnd(OrderItemEntity itemEnd) {
+        this.itemEnd = itemEnd;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "orderId", referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "orderId", referencedColumnName = "id", nullable = false)
     public OrderEntity getOrder() {
         return order;
     }

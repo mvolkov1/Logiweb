@@ -12,12 +12,4 @@
         <servlet-name>ServletFrontController</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
-    <!--<servlet>-->
-        <!--<servlet-name>ServletEditOrder</servlet-name>-->
-        <!--<servlet-class>com.tsystems.logiweb.web.ServletEditOrder</servlet-class>-->
-    <!--</servlet>-->
-    <!--<servlet-mapping>-->
-        <!--<servlet-name>ServletEditOrder</servlet-name>-->
-        <!--<url-pattern>/Logiweb/editOrder</url-pattern>-->
-    <!--</servlet-mapping>-->
 </web-app>

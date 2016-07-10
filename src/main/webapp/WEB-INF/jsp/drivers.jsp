@@ -45,9 +45,9 @@
                 <td> ${driver.user.lastName} </td>
                 <td> ${driver.monthHours} </td>
                 <td> ${driver.status} </td>
-                <td> ${driver.city.city} </td>
+                <td> ${driver.city.name} </td>
                 <td>
-                    <a href="order?orderId=${driver.order.uid}"> ${driver.order.uid}</a>
+                    <a href="editOrder?uid=${driver.order.uid}"> ${driver.order.uid}</a>
                 </td>
                 <td align="center">
                     <form action="editDriver" method="get">

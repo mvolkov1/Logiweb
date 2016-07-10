@@ -44,9 +44,9 @@
                 <td> ${vehicle.vin} </td>
                 <td> ${vehicle.capacity} </td>
                 <td> ${vehicle.numberOfDrivers} </td>
-                <td> ${vehicle.city.city} </td>
+                <td> ${vehicle.city.name} </td>
                 <td>${vehicle.isAvailable == 0 ? "no" : "yes"}</td>
-                <td><a href="order?orderId=${vehicle.order.uid}"> ${vehicle.order.uid}</a>
+                <td><a href="editOrder?uid=${vehicle.order.uid}"> ${vehicle.order.uid}</a>
                 </td>
                 <td align="center">
                     <form action="editVehicle" method="get">
@@ -55,7 +55,7 @@
                     </form>
                 </td>
                 <td align="center">
-                    <form onsubmit="return confirmDelete()" method="post">
+                    <form onsubmit="return confirmDelete()" method="get">
                         <input type="submit" value="Delete" class="buttonInCell">
                         <input type="hidden" name="deleteVehicle" value="true">
                         <input type="hidden" name="vin" value=${vehicle.vin}>

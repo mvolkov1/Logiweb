@@ -14,11 +14,6 @@ import java.util.List;
  */
 public class DriverDaoImpl extends BaseDaoImpl<DriverEntity> implements DriverDao {
 
-    public DriverDaoImpl(EntityManager entityManager)
-    {
-        super(entityManager);
-    }
-
     public DriverEntity findByUid(String uid)
     {
         Query query = entityManager.createQuery(

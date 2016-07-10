@@ -5,6 +5,7 @@ import com.tsystems.logiweb.dao.entity.*;
 import com.tsystems.logiweb.dao.impl.*;
 import com.tsystems.logiweb.services.TransactionManager;
 
+import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,18 +17,11 @@ import java.util.stream.Collectors;
 /**
  * Created by mvolkov on 17.06.2016.
  */
-public class OrderService {
+public class OrderService extends BaseService {
 
-    private OrderDao orderDao = new OrderDaoImpl(TransactionManager.getEntityManager());
-    CargoDao cargoDao = new CargoDaoImpl(TransactionManager.getEntityManager());
-    VehicleDao vehicleDao = new VehicleDaoImpl(TransactionManager.getEntityManager());
-    DriverDao driverDao = new DriverDaoImpl(TransactionManager.getEntityManager());
-    CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
-    OrderItemDao orderItemDao = new OrderItemDaoImpl(TransactionManager.getEntityManager());
 
-    public static void deleteOrder(String uid) {
+    public void deleteOrder(String uid) {
         if (uid != null && !uid.isEmpty()) {
-            OrderDao orderDao = new OrderDaoImpl(TransactionManager.getEntityManager());
             try {
                 TransactionManager.beginTransaction();
                 orderDao.deleteByUid(uid);
@@ -38,9 +32,8 @@ public class OrderService {
         }
     }
 
-    public static void createOrder(String uid) {
+    public void createOrder(String uid) {
         if (uid != null && !uid.isEmpty()) {
-            OrderDao orderDao = new OrderDaoImpl(TransactionManager.getEntityManager());
             try {
                 TransactionManager.beginTransaction();
                 OrderEntity orderEntity = orderDao.findByUid(uid);
@@ -56,14 +49,13 @@ public class OrderService {
         }
     }
 
-    public static void deleteItem(String uid, String itemNumber) {
+    public void deleteItem(String uid, String itemNumber) {
         int nItem = 0;
         try {
             nItem = Integer.parseInt(itemNumber);
         } catch (NumberFormatException e) {
             return;
         }
-        OrderDao orderDao = new OrderDaoImpl(TransactionManager.getEntityManager());
         try {
             TransactionManager.beginTransaction();
             OrderEntity order = orderDao.findByUid(uid);
@@ -97,8 +89,7 @@ public class OrderService {
         }
     }
 
-    public static void deleteCargo(String uid, String cargoUid) {
-        OrderDao orderDao = new OrderDaoImpl(TransactionManager.getEntityManager());
+    public void deleteCargo(String uid, String cargoUid) {
         try {
             TransactionManager.beginTransaction();
             OrderEntity order = orderDao.findByUid(uid);
@@ -114,9 +105,7 @@ public class OrderService {
         }
     }
 
-    public static void setVehicle(String uid, String vin) {
-        OrderDao orderDao = new OrderDaoImpl(TransactionManager.getEntityManager());
-        VehicleDao vehicleDao = new VehicleDaoImpl(TransactionManager.getEntityManager());
+    public void setVehicle(String uid, String vin) {
         try {
             TransactionManager.beginTransaction();
             OrderEntity order = orderDao.findByUid(uid);
@@ -132,19 +121,17 @@ public class OrderService {
         }
     }
 
-    public static void addDriver(String uid, String driverUid) {
-        OrderDao orderDao = new OrderDaoImpl(TransactionManager.getEntityManager());
-        DriverDao driverDao = new DriverDaoImpl(TransactionManager.getEntityManager());
+    public void deleteVehicle(String uid) {
         try {
             TransactionManager.beginTransaction();
             OrderEntity order = orderDao.findByUid(uid);
-            DriverEntity driver = driverDao.findByUid(driverUid);
-//            if (order.getVehicle() != null) {
-//                VehicleEntity oldVehicle = order.getVehicle();
-//                oldVehicle.setOrder(null);
-//            }
-            driver.setOrder(order);
-            //   vehicle.setOrder(order);
+            VehicleEntity vehicle = order.getVehicle();
+            vehicle.setOrder(null);
+            order.setVehicle(null);
+            for (DriverEntity driver : order.getDrivers()) {
+                driver.setOrder(null);
+            }
+            order.getDrivers().clear();
             TransactionManager.commit();
         } catch (Exception e) {
             TransactionManager.rollback();
@@ -152,11 +139,37 @@ public class OrderService {
     }
 
 
-    public static List<OrderEntity> getListOfOrders() {
+    public void addDriver(String uid, String driverUid) {
+        try {
+            TransactionManager.beginTransaction();
+            OrderEntity order = orderDao.findByUid(uid);
+            DriverEntity driver = driverDao.findByUid(driverUid);
+            driver.setOrder(order);
+            TransactionManager.commit();
+        } catch (Exception e) {
+            TransactionManager.rollback();
+        }
+    }
+
+    public void deleteDriver(String uid, String driverUid) {
+        try {
+            TransactionManager.beginTransaction();
+            OrderEntity order = orderDao.findByUid(uid);
+            DriverEntity driver = driverDao.findByUid(driverUid);
+            driver.setOrder(null);
+            order.getDrivers().remove(driver);
+            TransactionManager.commit();
+        } catch (Exception e) {
+            TransactionManager.rollback();
+        }
+    }
+
+
+    public List<OrderEntity> getListOfOrders() {
         List<OrderEntity> orders = null;
         try {
             TransactionManager.beginTransaction();
-            orders = new OrderDaoImpl(TransactionManager.getEntityManager()).getAllEntities(OrderEntity.class);
+            orders = orderDao.getAllEntities(OrderEntity.class);
             for (OrderEntity order : orders) {
                 order.getItems().size();
                 order.getDrivers().size();
@@ -169,11 +182,11 @@ public class OrderService {
         return orders;
     }
 
-    public static OrderEntity getOrder(String uid) {
+    public OrderEntity getOrder(String uid) {
         OrderEntity order = null;
         try {
             TransactionManager.beginTransaction();
-            order = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
+            order = orderDao.findByUid(uid);
             order.getItems().size();
             TransactionManager.commit();
         } catch (Exception e) {
@@ -182,13 +195,12 @@ public class OrderService {
         return order;
     }
 
-    public static void addItem(String uid, String cityName) {
-        List<OrderItemEntity> items = OrderService.getListOfItems(uid);
+    public void addItem(String uid, String cityName) {
+        List<OrderItemEntity> items = this.getListOfItems(uid);
         try {
             TransactionManager.beginTransaction();
-            OrderEntity order = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
-            DistanceDao distanceDao = new DistanceDaoImpl(TransactionManager.getEntityManager());
-            CityEntity city = new CityDaoImpl(TransactionManager.getEntityManager()).findByName(cityName);
+            OrderEntity order = orderDao.findByUid(uid);
+            CityEntity city = cityDao.findByName(cityName);
             if (order != null && city != null) {
                 OrderItemEntity item = new OrderItemEntity();
                 int nItems = items.size();
@@ -216,9 +228,8 @@ public class OrderService {
         }
     }
 
-    public static void addCargo(String uid, String cargoUID, String title, String mass,
-                                String cargoItem1, String cargoItem2, String status) {
-        OrderDao orderDao = new OrderDaoImpl(TransactionManager.getEntityManager());
+    public void addCargo(String uid, String cargoUID, String title, String mass,
+                         String cargoItem1, String cargoItem2, String status) {
         try {
             TransactionManager.beginTransaction();
             OrderEntity order = orderDao.findByUid(uid);
@@ -236,12 +247,10 @@ public class OrderService {
                 cargo.setMass(new BigDecimal(Integer.parseInt(mass)));
                 cargo.setStatus(status);
                 order.getCargos().add(cargo);
-                BigDecimal maxMass = OrderService.getMaxMass(order);
+                BigDecimal maxMass = this.getMaxMass(order);
                 VehicleEntity vehicle = order.getVehicle();
-                if (vehicle != null)
-                {
-                    if (vehicle.getCapacity().compareTo(maxMass) < 0)
-                    {
+                if (vehicle != null) {
+                    if (vehicle.getCapacity().compareTo(maxMass) < 0) {
                         vehicle.setOrder(null);
                         order.setVehicle(null);
                     }
@@ -253,14 +262,13 @@ public class OrderService {
         }
     }
 
-    public static List<OrderItemEntity> getListOfItems(String uid) {
+    public List<OrderItemEntity> getListOfItems(String uid) {
         List<OrderItemEntity> items = null;
         try {
             TransactionManager.beginTransaction();
             OrderEntity order = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
             if (order != null) {
                 items = (List<OrderItemEntity>) order.getItems();
-                DistanceDao distanceDao = new DistanceDaoImpl(TransactionManager.getEntityManager());
                 OrderItemEntity prevItem = null;
                 for (OrderItemEntity item : items) {
                     if (prevItem != null) {
@@ -286,18 +294,18 @@ public class OrderService {
         return items;
     }
 
-    public static Set<CityEntity> getListOfCities(String uid) {
+    public Set<CityEntity> getListOfCities(String uid) {
         Set<CityEntity> cities = new HashSet<>();
         try {
             TransactionManager.beginTransaction();
-            OrderEntity order = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
+            OrderEntity order = orderDao.findByUid(uid);
             if (order != null) {
                 int nItems = order.getItems().size();
                 if (nItems > 0) {
                     CityEntity lastCityEntity = ((List<OrderItemEntity>) order.getItems()).get(nItems - 1).getCity();
                     if (lastCityEntity != null) {
                         String lastCity = lastCityEntity.getName();
-                        List<DistanceEntity> distances = new DistanceDaoImpl(TransactionManager.getEntityManager()).getAllEntities(DistanceEntity.class);
+                        List<DistanceEntity> distances = distanceDao.getAllEntities(DistanceEntity.class);
                         for (DistanceEntity distance : distances) {
                             if (distance.getCity1().getName().equals(lastCity)) {
                                 cities.add(distance.getCity2());
@@ -308,8 +316,7 @@ public class OrderService {
                         }
                     }
                 } else {
-                    CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
-                    List<CityEntity> allCities = (List<CityEntity>) cityDao.getAllEntities(CityEntity.class);
+                    List<CityEntity> allCities = cityDao.getAllEntities(CityEntity.class);
                     cities = new HashSet<>(allCities);
                 }
             }
@@ -322,11 +329,11 @@ public class OrderService {
     }
 
 
-    public static List<CargoEntity> getListOfCargoes(String uid) {
+    public List<CargoEntity> getListOfCargoes(String uid) {
         List<CargoEntity> cargoes = null;
         try {
             TransactionManager.beginTransaction();
-            OrderEntity order = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
+            OrderEntity order = orderDao.findByUid(uid);
             if (order != null) {
                 cargoes = (List<CargoEntity>) order.getCargos();
                 cargoes.size();
@@ -339,15 +346,12 @@ public class OrderService {
         return cargoes;
     }
 
-    public static List<VehicleEntity> getListOfVehicles(String uid) {
-        List<VehicleEntity> vehicles = new VehicleDaoImpl(TransactionManager.getEntityManager())
-                .getAllEntities(VehicleEntity.class);
+    public List<VehicleEntity> getListOfVehicles(String uid) {
+        List<VehicleEntity> vehicles = vehicleDao.getAllEntities(VehicleEntity.class);
         try {
             TransactionManager.beginTransaction();
-            OrderEntity order = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
-
-            BigDecimal maxMass = OrderService.getMaxMass(order);
-
+            OrderEntity order = orderDao.findByUid(uid);
+            BigDecimal maxMass = this.getMaxMass(order);
             Iterator<VehicleEntity> iterator = vehicles.iterator();
             while (iterator.hasNext()) {
                 VehicleEntity vehicleEntity = iterator.next();
@@ -355,7 +359,6 @@ public class OrderService {
                     iterator.remove();
                 }
             }
-
             TransactionManager.commit();
         } catch (Exception e) {
             vehicles = null;
@@ -364,8 +367,7 @@ public class OrderService {
         return vehicles;
     }
 
-    protected static BigDecimal getMaxMass(OrderEntity order) throws  Exception
-    {
+    protected BigDecimal getMaxMass(OrderEntity order) throws Exception {
         BigDecimal maxMass = new BigDecimal(0);
         BigDecimal currentMass = new BigDecimal(0);
 
@@ -387,11 +389,11 @@ public class OrderService {
         return maxMass;
     }
 
-    public static List<DriverEntity> getListOfDrivers(String uid) {
+    public List<DriverEntity> getListOfDrivers(String uid) {
         List<DriverEntity> drivers = new ArrayList<>();
         try {
             TransactionManager.beginTransaction();
-            OrderEntity order = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
+            OrderEntity order = orderDao.findByUid(uid);
             if (order != null) {
                 drivers.addAll(order.getDrivers());
             }
@@ -403,14 +405,12 @@ public class OrderService {
         return drivers;
     }
 
-    public static List<DriverEntity> getListOfPossibleDrivers(String uid) {
+    public List<DriverEntity> getListOfPossibleDrivers(String uid) {
         List<DriverEntity> drivers = new ArrayList<>();
-        List<DriverEntity> allDrivers = new DriverDaoImpl(TransactionManager.getEntityManager()).
-                getAllEntities(DriverEntity.class);
+        List<DriverEntity> allDrivers = driverDao.getAllEntities(DriverEntity.class);
         try {
             TransactionManager.beginTransaction();
-            OrderEntity order = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
-//            drivers = allDrivers.stream().filter(order.getDrivers()::contains).collect(Collectors.toList());
+            OrderEntity order = orderDao.findByUid(uid);
             for (DriverEntity driver : allDrivers) {
                 if (!order.getDrivers().contains(driver)) {
                     drivers.add(driver);

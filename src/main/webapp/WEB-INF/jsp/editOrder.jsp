@@ -62,12 +62,12 @@
                 <td>${item.fullDistance}</td>
                 <td>
                     <c:if test="${item.itemNumber eq items.size()}">
-                    <form action="editOrder" method="post" onsubmit="return confirmDeleteItem()">
-                        <input type="submit" value="Delete" class="buttonInCell">
-                        <input type="hidden" name="step" value="deleteItem">
-                        <input type="hidden" name="itemNumber" value="${item.itemNumber}">
-                        <input type="hidden" name="uid" value="${uid}">
-                    </form>
+                        <form action="editOrder" method="post" onsubmit="return confirmDeleteItem()">
+                            <input type="submit" value="Delete" class="buttonInCell">
+                            <input type="hidden" name="step" value="deleteItem">
+                            <input type="hidden" name="itemNumber" value="${item.itemNumber}">
+                            <input type="hidden" name="uid" value="${uid}">
+                        </form>
                     </c:if>
                 </td>
             </tr>
@@ -166,21 +166,37 @@
 
 
     <h4>Vehicle</h4>
-    <form action="editOrder" method="post">
-        <select name="vin" id="vin">
-            <option value="" disabled selected hidden>Select vehicle...</option>
-            <c:forEach var="vehicle1" items="${vehicles}">
-                <option value="${vehicle1.vin}" ${vehicle1.vin.equals(vehicleVin)? 'selected="selected"' : ''}>
-                        ${vehicle1.vin}; number of drivers = ${vehicle1.numberOfDrivers};
-                    capacity
-                    = ${vehicle1.capacity}
-                </option>
-            </c:forEach>
-        </select>
-        <input type="submit" value="Set vehicle" class="buttonSingle">
-        <input type="hidden" name="uid" value="${uid}">
-        <input type="hidden" name="step" value="vehicle">
-    </form>
+    <table>
+        <tr>
+            <td>
+                <form action="editOrder" method="post" onsubmit="return validateVehicle()">
+                    <select name="vin" id="vin">
+                        <option value="" disabled selected hidden>Select vehicle...</option>
+                        <c:forEach var="vehicle1" items="${vehicles}">
+                            <option value="${vehicle1.vin}" ${vehicle1.vin.equals(vehicleVin)? 'selected="selected"' : ''}>
+                                    ${vehicle1.vin}; number of drivers = ${vehicle1.numberOfDrivers};
+                                capacity
+                                = ${vehicle1.capacity}
+                            </option>
+                        </c:forEach>
+                    </select>
+                    <input type="submit" value="Set vehicle" class="buttonSingle">
+                    <input type="hidden" name="uid" value="${uid}">
+                    <input type="hidden" name="step" value="vehicle">
+                </form>
+            </td>
+            <td> &nbsp</td>
+            <td>
+                <c:if test="${not empty vehicleVin}">
+                    <form action="editOrder" method="post">
+                        <input type="submit" value="Delete vehicle" class="buttonSingle">
+                        <input type="hidden" name="uid" value="${uid}">
+                        <input type="hidden" name="step" value="deleteVehicle">
+                    </form>
+                </c:if>
+            </td>
+        </tr>
+    </table>
     <br>
 
 
@@ -193,7 +209,7 @@
                     <c:out value="${driver1.user.firstName} ${driver1.user.lastName} (${driver1.uid})"></c:out>
                 </td>
                 <td align="center" method="post">
-                    <form action="editOrder" method="post" onsubmit="return confirmDeleteCargo()">
+                    <form action="editOrder" method="post" onsubmit="return confirmDeleteDriver()">
                         <input type="submit" value="Delete" class="buttonInCell">
                         <input type="hidden" name="step" value="deleteDriver">
                         <input type="hidden" name="driverUid" value="${driver1.uid}">
@@ -203,7 +219,7 @@
             </tr>
         </c:forEach>
         <tr>
-            <form method="post">
+            <form method="post" onsubmit="return validateDriver()">
                 <td>
                     <select name="driverUid" id="driverUid">
                         <option value="" disabled selected hidden>Select driver...</option>
@@ -221,30 +237,8 @@
                 </td>
             </form>
         </tr>
-
-
-        <%--<c:if test="${empty orderCompletlyCreated}">--%>
-        <%--<form action="newOrder" method="post" onsubmit="return onAddDriver()">--%>
-        <%--<select name="driverUid" id="driverUid">--%>
-        <%--<option value="" disabled selected hidden>Select driver...</option>--%>
-        <%--<c:forEach var="driver" items="${drivers}">--%>
-        <%--<option value="${driver.uid}">--%>
-        <%--<c:out value="uid=${driver.uid}, ${driver.user.firstName} ${driver.user.lastName}, monthHours = ${driver.monthHours}"></c:out>--%>
-        <%--</option>--%>
-        <%--</c:forEach>--%>
-        <%--</select>--%>
-        <%--<input type="submit" value="Add driver" class="buttonSingle">--%>
-        <%--<input type="hidden" name="editOrder" value="true">--%>
-        <%--<input type="hidden" name="saveDriver" value="true">--%>
-        <%--<input type="hidden" name="uid" value="${uid}">--%>
-        <%--</form>--%>
-        <%--</c:if>--%>
-        <%--</td>--%>
-        </tr>
-
-
     </table>
-
+    <br>
 
 </div>
 </body>

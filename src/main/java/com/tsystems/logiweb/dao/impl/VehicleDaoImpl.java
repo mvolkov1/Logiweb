@@ -16,11 +16,6 @@ import java.util.List;
  */
 public class VehicleDaoImpl extends BaseDaoImpl<VehicleEntity> implements VehicleDao {
 
-    public VehicleDaoImpl(EntityManager entityManager) {
-        super(entityManager);
-    }
-
-
     public VehicleEntity findByVin(String vin) {
 
         Query query = entityManager.createQuery(
@@ -46,38 +41,5 @@ public class VehicleDaoImpl extends BaseDaoImpl<VehicleEntity> implements Vehicl
     }
 
 
-    public List<VehicleEntity> getListOfVehiclesForOrder(OrderEntity orderEntity) {
-
-        VehicleDao vehicleDao = new VehicleDaoImpl(TransactionManager.getEntityManager());
-        List<VehicleEntity> vehiclesForOrder = new ArrayList<VehicleEntity>();
-        List<OrderItemEntity> items = (List<OrderItemEntity>) orderEntity.getItems();
-        List<CargoEntity> cargos = (List<CargoEntity>) orderEntity.getCargos();
-        List<VehicleEntity> vehicles = vehicleDao.getAllEntities(VehicleEntity.class);
-
-        for (VehicleEntity v : vehicles) {
-            if (v.getOrder() != null) continue;
-            boolean isGood = true;
-
-            for (OrderItemEntity oi : orderEntity.getItems()) {
-
-                BigDecimal massAtItem = new BigDecimal(0);
-                for (CargoEntity c : cargos) {
-                    if (c.getItemStart().getCity().equals(oi.getCity().getName())) {
-                        massAtItem = massAtItem.add(c.getMass());
-                    }
-                }
-
-                if (massAtItem.compareTo(v.getCapacity()) > 0) {
-                    isGood = false;
-                    break;
-                }
-            }
-
-            if (isGood) {
-                vehiclesForOrder.add(v);
-            }
-        }
-        return vehiclesForOrder;
-    }
 
 }

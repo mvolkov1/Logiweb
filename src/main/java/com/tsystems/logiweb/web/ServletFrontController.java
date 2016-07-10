@@ -1,6 +1,7 @@
 package com.tsystems.logiweb.web;
 
 import com.tsystems.logiweb.dao.entity.*;
+import com.tsystems.logiweb.services.TransactionManager;
 import com.tsystems.logiweb.services.impl.*;
 
 import javax.servlet.ServletException;
@@ -19,10 +20,21 @@ import java.util.Set;
  */
 public class ServletFrontController extends HttpServlet {
 
+    private OrderService orderService = new OrderService();
+    private UserService userService = new UserService();
+    private VehicleService vehicleService = new VehicleService();
+    private  DriverService driverService = new DriverService();
+    private CityService cityService = new CityService();
+
+
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         StringBuffer servletUrl = request.getRequestURL();
+        orderService.setEntityManager(TransactionManager.getEntityManager());
+        userService.setEntityManager(TransactionManager.getEntityManager());
+        vehicleService.setEntityManager(TransactionManager.getEntityManager());
+        driverService.setEntityManager(TransactionManager.getEntityManager());
 
         if (servletUrl != null) {
             URL url = new URL(servletUrl.toString());
@@ -34,7 +46,7 @@ public class ServletFrontController extends HttpServlet {
                 if (login != null && password != null) {
                     StringBuilder firstName = new StringBuilder();
                     StringBuilder lastName = new StringBuilder();
-                    address = UserService.handleLoginPassword(login, password, firstName, lastName);
+                    address = userService.handleLoginPassword(login, password, firstName, lastName);
                     if (address != null) {
                         request.setAttribute("lastName", lastName.toString());
                         request.setAttribute("firstName", firstName.toString());
@@ -54,7 +66,7 @@ public class ServletFrontController extends HttpServlet {
                         String city = request.getParameter("city");
                         String isAvailable = request.getParameter("isAvailable1");
                         isAvailable = isAvailable.equals("no") ? "0" : "1";
-                        VehicleService.saveVehicle(vin, capacity, numberOfDrivers, city, isAvailable);
+                        vehicleService.saveVehicle(vin, capacity, numberOfDrivers, city, isAvailable);
                     }
                 }
                 response.sendRedirect("vehicles");
@@ -68,7 +80,7 @@ public class ServletFrontController extends HttpServlet {
                         String monthHours = request.getParameter("monthHours");
                         String city = request.getParameter("city");
                         String status = request.getParameter("status1");
-                        DriverService.saveDriver(uid, oldUid, monthHours, status, city);
+                        driverService.saveDriver(uid, oldUid, monthHours, status, city);
                     }
                 }
                 response.sendRedirect("drivers");
@@ -79,13 +91,13 @@ public class ServletFrontController extends HttpServlet {
                 if (uid != null && !uid.isEmpty()) {
                     if (step != null) {
                         if (step.equals("uid")) {
-                            OrderService.createOrder(uid);
+                            orderService.createOrder(uid);
                         } else if (step.equals("item")) {
                             String city = request.getParameter("city");
-                            OrderService.addItem(uid, city);
+                            orderService.addItem(uid, city);
                         } else if (step.equals("deleteItem")) {
                             String itemNumber = request.getParameter("itemNumber");
-                            OrderService.deleteItem(uid, itemNumber);
+                            orderService.deleteItem(uid, itemNumber);
                         } else if (step.equals("cargo")) {
                             String cargoUid = request.getParameter("cargoUid");
                             String title = request.getParameter("cargoTitle");
@@ -93,16 +105,21 @@ public class ServletFrontController extends HttpServlet {
                             String cargoItem1 = request.getParameter("cargoItem1");
                             String cargoItem2 = request.getParameter("cargoItem2");
                             String status = request.getParameter("status");
-                            OrderService.addCargo(uid, cargoUid, title, mass, cargoItem1, cargoItem2, status);
+                            orderService.addCargo(uid, cargoUid, title, mass, cargoItem1, cargoItem2, status);
                         } else if (step.equals("deleteCargo")) {
                             String cargoUid = request.getParameter("cargoUid");
-                            OrderService.deleteCargo(uid, cargoUid);
+                            orderService.deleteCargo(uid, cargoUid);
                         } else if (step.equals("vehicle")) {
                             String vin = request.getParameter("vin");
-                            OrderService.setVehicle(uid, vin);
+                            orderService.setVehicle(uid, vin);
+                        } else if (step.equals("deleteVehicle")) {
+                            orderService.deleteVehicle(uid);
                         } else if (step.equals("driver")) {
                             String driverUid = request.getParameter("driverUid");
-                            OrderService.addDriver(uid, driverUid);
+                            orderService.addDriver(uid, driverUid);
+                        } else if (step.equals("deleteDriver")) {
+                            String driverUid = request.getParameter("driverUid");
+                            orderService.deleteDriver(uid, driverUid);
                         }
                     }
                 }
@@ -122,6 +139,10 @@ public class ServletFrontController extends HttpServlet {
 
         StringBuffer servletUrl = request.getRequestURL();
 
+        orderService.setEntityManager(TransactionManager.getEntityManager());
+        vehicleService.setEntityManager(TransactionManager.getEntityManager());
+        driverService.setEntityManager(TransactionManager.getEntityManager());
+
         if (servletUrl != null) {
             String address = null;
             URL url = new URL(servletUrl.toString());
@@ -133,17 +154,17 @@ public class ServletFrontController extends HttpServlet {
                 String vin = request.getParameter("vin");
                 if (vin != null && !vin.isEmpty()) {
                     if (deleteVehicle != null && deleteVehicle.equals("true")) {
-                        VehicleService.deleteVehicle(vin);
+                        vehicleService.deleteVehicle(vin);
                     }
                 }
-                List<VehicleEntity> vehicles = VehicleService.getListOfVehicles();
+                List<VehicleEntity> vehicles = vehicleService.getListOfVehicles();
                 request.setAttribute("list", vehicles);
                 request.getRequestDispatcher("/WEB-INF/jsp/vehicles.jsp").forward(request, response);
                 return;
             } else if (path.equals("/Logiweb/editVehicle")) {
                 String vin = request.getParameter("vin");
                 if (vin != null) {
-                    VehicleEntity vehicle = VehicleService.getVehicle(vin);
+                    VehicleEntity vehicle = vehicleService.getVehicle(vin);
                     if (vehicle != null) {
                         request.setAttribute("vin", vehicle.getVin());
                         request.setAttribute("capacity", vehicle.getCapacity());
@@ -153,19 +174,19 @@ public class ServletFrontController extends HttpServlet {
                         request.setAttribute("order", vehicle.getOrder());
                     }
                 }
-                List<CityEntity> cities = CityService.getListOfCities();
+                List<CityEntity> cities = cityService.getListOfCities();
                 request.setAttribute("cities", cities);
                 request.getRequestDispatcher("/WEB-INF/jsp/editVehicle.jsp").forward(request, response);
                 return;
             } else if (path.equals("/Logiweb/drivers")) {
-                List<DriverEntity> drivers = DriverService.getListOfDrivers();
+                List<DriverEntity> drivers = driverService.getListOfDrivers();
                 request.setAttribute("list", drivers);
                 request.getRequestDispatcher("/WEB-INF/jsp/drivers.jsp").forward(request, response);
                 return;
             } else if (path.equals("/Logiweb/editDriver")) {
                 String uid = request.getParameter("uid");
                 if (uid != null) {
-                    DriverEntity driver = DriverService.getDriver(uid);
+                    DriverEntity driver = driverService.getDriver(uid);
                     if (driver != null) {
                         request.setAttribute("uid", driver.getUid());
                         request.setAttribute("monthHours", driver.getMonthHours());
@@ -175,7 +196,7 @@ public class ServletFrontController extends HttpServlet {
                         request.setAttribute("lastName", driver.getUser().getLastName());
                     }
                 }
-                List<CityEntity> cities = CityService.getListOfCities();
+                List<CityEntity> cities = cityService.getListOfCities();
                 request.setAttribute("cities", cities);
                 request.getRequestDispatcher("/WEB-INF/jsp/editDriver.jsp").forward(request, response);
                 return;
@@ -184,30 +205,30 @@ public class ServletFrontController extends HttpServlet {
                 String deleteOrder = request.getParameter("deleteOrder");
                 if (uid != null && !uid.isEmpty()) {
                     if (deleteOrder != null && deleteOrder.equals("true")) {
-                        OrderService.deleteOrder(uid);
+                        orderService.deleteOrder(uid);
                     }
                 }
-                List<OrderEntity> orders = OrderService.getListOfOrders();
+                List<OrderEntity> orders = orderService.getListOfOrders();
                 request.setAttribute("list", orders);
                 request.getRequestDispatcher("/WEB-INF/jsp/orders.jsp").forward(request, response);
             } else {
                 if (path.equals("/Logiweb/editOrder")) {
                     String uid = request.getParameter("uid");
                     if (uid != null && !uid.isEmpty()) {
-                        OrderEntity orderEntity = OrderService.getOrder(uid);
+                        OrderEntity orderEntity = orderService.getOrder(uid);
                         if (orderEntity == null)
                             return;
                         request.setAttribute("uid", uid);
-                        Set<CityEntity> cities = OrderService.getListOfCities(uid);
+                        Set<CityEntity> cities = orderService.getListOfCities(uid);
                         request.setAttribute("cities", cities);
-                        List<OrderItemEntity> items = OrderService.getListOfItems(uid);
+                        List<OrderItemEntity> items = orderService.getListOfItems(uid);
                         request.setAttribute("items", items);
                         List<String> itemNumbers = new ArrayList<>();
                         for (int i = 1; i <= orderEntity.getItems().size(); i++) {
                             itemNumbers.add(Integer.toString(i));
                         }
                         request.setAttribute("itemNumbers", itemNumbers);
-                        List<CargoEntity> cargoes = OrderService.getListOfCargoes(uid);
+                        List<CargoEntity> cargoes = orderService.getListOfCargoes(uid);
                         request.setAttribute("cargoes", cargoes);
                         List<String> statusList = new ArrayList<>();
                         statusList.add("Prepared");
@@ -221,15 +242,15 @@ public class ServletFrontController extends HttpServlet {
                             CityEntity lastCity = lastItem.getCity();
                             cities.remove(lastCity);
                         }
-                        List<VehicleEntity> vehicles = OrderService.getListOfVehicles(uid);
+                        List<VehicleEntity> vehicles = orderService.getListOfVehicles(uid);
                         request.setAttribute("vehicles", vehicles);
                         VehicleEntity vehicle = orderEntity.getVehicle();
                         if (vehicle != null) {
                             request.setAttribute("vehicleVin", vehicle.getVin());
                         }
-                        List<DriverEntity> possibleDrivers = OrderService.getListOfPossibleDrivers(uid);
+                        List<DriverEntity> possibleDrivers = orderService.getListOfPossibleDrivers(uid);
                         request.setAttribute("possibleDrivers", possibleDrivers);
-                        List<DriverEntity> drivers = OrderService.getListOfDrivers(uid);
+                        List<DriverEntity> drivers = orderService.getListOfDrivers(uid);
                         request.setAttribute("drivers", drivers);
                     }
 

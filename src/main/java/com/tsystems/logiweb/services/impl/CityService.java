@@ -1,5 +1,6 @@
 package com.tsystems.logiweb.services.impl;
 
+import com.tsystems.logiweb.dao.impl.BaseDaoImpl;
 import com.tsystems.logiweb.services.TransactionManager;
 import com.tsystems.logiweb.dao.api.CityDao;
 import com.tsystems.logiweb.dao.entity.CityEntity;
@@ -10,9 +11,7 @@ import java.util.List;
 /**
  * Created by mvolkov on 17.06.2016.
  */
-public class CityService {
-
-    private CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
+public class CityService extends BaseService {
 
     public void addCity(String city) {
         try {
@@ -24,11 +23,10 @@ public class CityService {
         } catch (Exception e) {
             TransactionManager.rollback();
         }
-
     }
 
-    public static List<CityEntity> getListOfCities()
+    public List<CityEntity> getListOfCities()
     {
-        return new CityDaoImpl(TransactionManager.getEntityManager()).getAllEntities(CityEntity.class);
+        return cityDao.getAllEntities(CityEntity.class);
     }
 }

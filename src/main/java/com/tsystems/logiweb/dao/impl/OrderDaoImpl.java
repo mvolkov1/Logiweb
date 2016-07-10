@@ -17,6 +17,10 @@ public class OrderDaoImpl extends BaseDaoImpl<OrderEntity> implements OrderDao {
         super(entityManager);
     }
 
+    public OrderDaoImpl() {
+        super();
+    }
+
     public OrderEntity findByUid(String orderId) {
         Query query = entityManager.createQuery("select object(o) from OrderEntity o where o.uid=:id");
         query.setParameter("id", orderId);
@@ -39,26 +43,6 @@ public class OrderDaoImpl extends BaseDaoImpl<OrderEntity> implements OrderDao {
             } catch (Exception e) {
                 throw e;
             }
-        }
-    }
-
-
-    public void updateOrder(OrderEntity orderEntity, String uid, String numberOfItems, String isCompleted) {
-        Query query = entityManager.createQuery("update OrderEntity o"
-                + " set o.uid = :uid, "
-                + " o.numberOfItems= :numberOfItems, "
-                + " o.isCompleted = :isCompleted "
-                + " where o.id = :id");
-        query.setParameter("id", orderEntity.getId());
-        query.setParameter("uid", uid);
-        query.setParameter("numberOfItems", Integer.parseInt(numberOfItems));
-        query.setParameter("isCompleted", Short.parseShort(isCompleted));
-
-        int updateCount = 0;
-        try {
-            updateCount = query.executeUpdate();
-        } catch (Exception e) {
-
         }
     }
 }

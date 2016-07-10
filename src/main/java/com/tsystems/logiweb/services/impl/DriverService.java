@@ -19,21 +19,18 @@ import java.util.List;
 /**
  * Created by mvolkov on 16.06.2016.
  */
-public class DriverService {
+public class DriverService extends BaseService {
 
 
-    public static void addDriver(String login, String password, String firstName, String lastName,
-                                 String uid, int monthHours, String status, String city) {
-
-        DriverDao driverDao = new DriverDaoImpl(TransactionManager.getEntityManager());
-
+    public void addDriver(String login, String password, String firstName, String lastName,
+                          String uid, int monthHours, String status, String city) {
         try {
             TransactionManager.beginTransaction();
             DriverEntity driverEntity = new DriverEntity();
             driverEntity.setUid(uid);
             driverEntity.setMonthHours(monthHours);
             driverEntity.setStatus(status);
-            driverEntity.setCity(new CityDaoImpl(TransactionManager.getEntityManager()).findByName(city));
+            driverEntity.setCity(cityDao.findByName(city));
 
             UserEntity userEntity = new UserEntity();
             userEntity.setLogin(login);
@@ -50,48 +47,40 @@ public class DriverService {
         } catch (Exception e) {
             TransactionManager.rollback();
         }
-
-
     }
 
-
-    public static List<DriverEntity> getListOfDrivers() {
+    public List<DriverEntity> getListOfDrivers() {
 
         List<DriverEntity> drivers = null;
         try {
             TransactionManager.beginTransaction();
-            drivers = new DriverDaoImpl(TransactionManager.getEntityManager()).getAllEntities(DriverEntity.class);
+            drivers = driverDao.getAllEntities(DriverEntity.class);
             TransactionManager.commit();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             drivers = null;
         }
         return drivers;
     }
 
-    public static DriverEntity getDriver(String uid) {
+    public DriverEntity getDriver(String uid) {
         DriverEntity driver = null;
         try {
             TransactionManager.beginTransaction();
-            driver = new DriverDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
+            driver = driverDao.findByUid(uid);
             TransactionManager.commit();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             driver = null;
         }
         return driver;
     }
 
-    public static void saveDriver(String uid, String oldUid, String monthHours, String status, String city) {
-        DriverDao driverDao = new DriverDaoImpl(TransactionManager.getEntityManager());
+    public void saveDriver(String uid, String oldUid, String monthHours, String status, String city) {
         if (oldUid != null && !oldUid.isEmpty() && monthHours != null && status != null && city != null) {
             try {
                 TransactionManager.beginTransaction();
                 DriverEntity driverEntity = driverDao.findByUid(oldUid);
                 if (driverEntity != null) {
-                    CityEntity cityEntity = new CityDaoImpl(TransactionManager.getEntityManager()).findByName(city);
+                    CityEntity cityEntity = cityDao.findByName(city);
                     driverEntity.setUid(uid);
                     driverEntity.setCity(cityEntity);
                     driverEntity.setStatus(status);

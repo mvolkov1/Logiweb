@@ -1,8 +1,9 @@
 input.buttonInCell {
-    background-color: #4CAF50;
+    background-color: transparent;/*#6CBF70;*/
     border: none;
-    color: white;
+    /*color: white;*/
     cursor: pointer;
+    font-weight: bold;
     width: 100%;
 }
 
@@ -23,9 +24,12 @@ input.buttonAddToTable {
 }
 
 input.buttonSingle {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    cursor: pointer;
+    /*background-color: transparent;*/
+    border: 1px solid #000;
+    /*font-weight: bold;*/
+    /*!*background-color: #4CAF50;*!*/
+    /*!*border: none;*!*/
+    /*!*color: white;*!*/
+    /*cursor: pointer;*/
 }
 

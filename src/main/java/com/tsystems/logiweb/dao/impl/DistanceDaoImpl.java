@@ -11,17 +11,6 @@ import javax.persistence.*;
  */
 public class DistanceDaoImpl extends BaseDaoImpl<DistanceEntity> implements DistanceDao{
 
-    public DistanceDaoImpl(EntityManager entityManager)
-    {
-        super(entityManager);
-    }
-
-
-
-    public DistanceEntity findById(long id) {
-        return entityManager.find(DistanceEntity.class, id);
-    }
-
     public DistanceEntity findDistance(CityEntity city1, CityEntity city2){
 
         Query query = entityManager.createQuery(

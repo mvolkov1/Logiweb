@@ -19,23 +19,19 @@ import java.util.List;
 /**
  * Created by mvolkov on 27.05.2016.
  */
-public class VehicleService {
+public class VehicleService extends  BaseService {
 
 
-    public static void createVehicle(String vin, float capacity, int numberOfDrivers, short isAvailable, String city) {
+    public void createVehicle(String vin, float capacity, int numberOfDrivers, short isAvailable, String city) {
 
-        VehicleDao vehicleDao = new VehicleDaoImpl(TransactionManager.getEntityManager());
         try {
             TransactionManager.beginTransaction();
-
-            CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
             VehicleEntity vehicleEntity = new VehicleEntity();
             vehicleEntity.setVin(vin);
             vehicleEntity.setCapacity(new BigDecimal(capacity));
             vehicleEntity.setNumberOfDrivers(numberOfDrivers);
             vehicleEntity.setCity(cityDao.findByName(city));
             vehicleEntity.setIsAvailable(isAvailable);
-
             vehicleDao.save(vehicleEntity);
             TransactionManager.commit();
         } catch (Exception e) {
@@ -44,9 +40,8 @@ public class VehicleService {
     }
 
 
-    public static void saveVehicle(String vin, String capacity, String numberOfDrivers, String city, String isAvailable) {
+    public void saveVehicle(String vin, String capacity, String numberOfDrivers, String city, String isAvailable) {
 
-        VehicleDao vehicleDao = new VehicleDaoImpl(TransactionManager.getEntityManager());
         if (capacity != null && numberOfDrivers != null && city != null && isAvailable != null) {
 
             try {
@@ -57,7 +52,7 @@ public class VehicleService {
                     vehicleEntity = new VehicleEntity();
                     vehicleEntity.setVin(vin);
                 }
-                CityEntity cityEntity = new CityDaoImpl(TransactionManager.getEntityManager()).findByName(city);
+                CityEntity cityEntity = cityDao.findByName(city);
                 vehicleEntity.setCity(cityEntity);
                 vehicleEntity.setCapacity(new BigDecimal(capacity));
                 vehicleEntity.setNumberOfDrivers(Integer.parseInt(numberOfDrivers));
@@ -70,12 +65,12 @@ public class VehicleService {
         }
     }
 
-    public static List<VehicleEntity> getListOfVehicles() {
+    public List<VehicleEntity> getListOfVehicles() {
         List<VehicleEntity> vehicles = null;
         try {
             TransactionManager.beginTransaction();
 
-            vehicles = new VehicleDaoImpl(TransactionManager.getEntityManager()).getAllEntities(VehicleEntity.class);
+            vehicles = vehicleDao.getAllEntities(VehicleEntity.class);
             TransactionManager.commit();
         } catch (Exception e) {
             vehicles = null;
@@ -83,21 +78,21 @@ public class VehicleService {
         return vehicles;
     }
 
-    public static void deleteVehicle(String vin) {
+    public void deleteVehicle(String vin) {
         try {
             TransactionManager.beginTransaction();
-            new VehicleDaoImpl(TransactionManager.getEntityManager()).deleteByVin(vin);
+           vehicleDao.deleteByVin(vin);
             TransactionManager.commit();
         } catch (Exception e) {
             TransactionManager.rollback();
         }
     }
 
-    public static VehicleEntity getVehicle(String vin) {
+    public VehicleEntity getVehicle(String vin) {
         VehicleEntity vehicle = null;
         try {
             TransactionManager.beginTransaction();
-            vehicle = new VehicleDaoImpl(TransactionManager.getEntityManager()).findByVin(vin);
+            vehicle = vehicleDao.findByVin(vin);
             TransactionManager.commit();
         } catch (Exception e) {
             vehicle = null;

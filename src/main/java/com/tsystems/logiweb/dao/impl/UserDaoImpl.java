@@ -13,60 +13,51 @@ import java.util.List;
  */
 public class UserDaoImpl extends BaseDaoImpl<UserEntity> implements UserDao {
 
-    public UserDaoImpl(EntityManager entityManager)
-    {
+    public UserDaoImpl(EntityManager entityManager) {
         super(entityManager);
     }
 
-    public UserEntity findByLogin(String login)
-    {
+    public UserDaoImpl() {
+        super();
+    }
+
+    public UserEntity findByLogin(String login) {
         UserEntity userEntity = null;
         Query query = entityManager.createQuery(
                 "select object(c) from UserEntity c where c.login = :login"
         );
         query.setParameter("login", login);
-        try
-        {
+        try {
             userEntity = (UserEntity) query.getSingleResult();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             userEntity = null;
         }
         return userEntity;
     }
 
-    public List<UserEntity> getListOfDrivers()
-    {
+    public List<UserEntity> getListOfDrivers() {
         Query query = entityManager.createQuery(
                 "select object(u) from UserEntity u where u.role = :role"
         );
         query.setParameter("role", "driver");
         List<UserEntity> listOfDrivers = null;
-        try
-        {
+        try {
             listOfDrivers = (List<UserEntity>) query.getResultList();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             listOfDrivers = null;
         }
         return listOfDrivers;
     }
 
-    public List<UserEntity> getListOfManagers()
-    {
+    public List<UserEntity> getListOfManagers() {
         Query query = entityManager.createQuery(
                 "select object(u) from UserEntity u where u.role = :role"
         );
         query.setParameter("role", "manager");
         List<UserEntity> listOfManagers = null;
-        try
-        {
+        try {
             listOfManagers = (List<UserEntity>) query.getResultList();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             listOfManagers = null;
         }
         return listOfManagers;

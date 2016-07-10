@@ -13,16 +13,11 @@ import java.util.List;
 /**
  * Created by mvolkov on 18.06.2016.
  */
-public class DistanceService {
-
-    private DistanceDao distanceDao = new DistanceDaoImpl(TransactionManager.getEntityManager());
+public class DistanceService extends BaseService{
 
     public void addDistance(String city1, String city2, float distance) {
         try {
             TransactionManager.beginTransaction();
-
-            CityDao cityDao = new CityDaoImpl(TransactionManager.getEntityManager());
-
             DistanceEntity distanceEntity = new DistanceEntity();
             distanceEntity.setCity1(cityDao.findByName(city1));
             distanceEntity.setCity2(cityDao.findByName(city2));

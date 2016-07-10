@@ -5,6 +5,7 @@ import com.tsystems.logiweb.dao.api.UserDao;
 import com.tsystems.logiweb.dao.entity.UserEntity;
 import com.tsystems.logiweb.dao.impl.UserDaoImpl;
 
+import javax.persistence.EntityManager;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * Created by mvolkov on 19.06.2016.
  */
-public class UserService {
+public class UserService extends BaseService {
 
 
     private void addUser(String login, String password, String role, String firstName, String lastName) {
@@ -28,7 +29,7 @@ public class UserService {
             userEntity.setRole(role);
             userEntity.setFirstName(firstName);
             userEntity.setLastName(lastName);
-            new UserDaoImpl(TransactionManager.getEntityManager()).save(userEntity);
+            userDao.save(userEntity);
             TransactionManager.commit();
         } catch (Exception e) {
             TransactionManager.rollback();
@@ -39,11 +40,11 @@ public class UserService {
         addUser(login, password, role, firstName, lastName);
     }
 
-    public static String handleLoginPassword(String login, String password, StringBuilder firstName, StringBuilder lastName) {
+    public String handleLoginPassword(String login, String password, StringBuilder firstName, StringBuilder lastName) {
         String address = null;
         try {
             TransactionManager.beginTransaction();
-            UserEntity userEntity = new UserDaoImpl(TransactionManager.getEntityManager()).findByLogin(login);
+            UserEntity userEntity = userDao.findByLogin(login);
             if (userEntity != null && userEntity.getPassword().equals(password)) {
                 firstName.append(new StringBuilder(userEntity.getFirstName()));
                 lastName.append(new StringBuilder(userEntity.getLastName()));

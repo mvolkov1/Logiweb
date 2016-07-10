@@ -10,11 +10,6 @@ import javax.persistence.*;
  */
 public class CityDaoImpl extends BaseDaoImpl<CityEntity> implements CityDao {
 
-    public CityDaoImpl(EntityManager entityManager)
-    {
-        super(entityManager);
-    }
-
     public CityEntity findById(long id) {
         return entityManager.find(CityEntity.class, id);
     }

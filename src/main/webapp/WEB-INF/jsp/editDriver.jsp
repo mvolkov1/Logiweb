@@ -21,8 +21,8 @@
 
 <!-- Site navigation menu -->
 <ul class="navbar">
-    <li><a href="vehicles" class="active">Vehicles</a></li>
-    <li><a href="drivers">Drivers</a></li>
+    <li><a href="vehicles" >Vehicles</a></li>
+    <li><a href="drivers" class="active">Drivers</a></li>
     <li><a href="orders">Orders</a></li>
 </ul>
 
@@ -46,7 +46,7 @@
                 <td>
                     <select name="city" class="edit">
                         <c:forEach var="city1" items="${cities}">
-                            <option value="${city1.name}" ${city1.name == driverCity ? 'selected="selected"' : ''}>${city1.name}</option>
+                            <option value="${city1.name}" ${city1.name.equals(driverCity) ? 'selected="selected"' : ''}>${city1.name}</option>
                         </c:forEach>
                     </select>
                 </td>

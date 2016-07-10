@@ -113,6 +113,10 @@ public class OrderService extends BaseService {
             if (order.getVehicle() != null) {
                 VehicleEntity oldVehicle = order.getVehicle();
                 oldVehicle.setOrder(null);
+                for (DriverEntity driver : order.getDrivers()) {
+                    driver.setOrder(null);
+                }
+                order.getDrivers().clear();
             }
             vehicle.setOrder(order);
             TransactionManager.commit();
@@ -195,38 +199,6 @@ public class OrderService extends BaseService {
         return order;
     }
 
-    public void addItem(String uid, String cityName) {
-        List<OrderItemEntity> items = this.getListOfItems(uid);
-        try {
-            TransactionManager.beginTransaction();
-            OrderEntity order = orderDao.findByUid(uid);
-            CityEntity city = cityDao.findByName(cityName);
-            if (order != null && city != null) {
-                OrderItemEntity item = new OrderItemEntity();
-                int nItems = items.size();
-                item.setItemNumber(nItems + 1);
-                item.setCity(city);
-                item.setOrder(order);
-                OrderItemEntity prevItem = null;
-                if (nItems > 1) {
-                    prevItem = items.get(nItems - 1);
-                    CityEntity city1 = item.getCity();
-                    CityEntity city2 = prevItem.getCity();
-                    DistanceEntity distanceEntity = distanceDao.findDistance(city1, city2);
-                    BigDecimal fullDistance = prevItem.getFullDistance().add(distanceEntity.getDistance());
-                    item.setDistance(distanceEntity.getDistance());
-                    item.setFullDistance(fullDistance);
-                } else {
-                    item.setDistance(new BigDecimal(0));
-                    item.setFullDistance(new BigDecimal(0));
-                }
-                order.getItems().add(item);
-            }
-            TransactionManager.commit();
-        } catch (Exception e) {
-            TransactionManager.rollback();
-        }
-    }
 
     public void addCargo(String uid, String cargoUID, String title, String mass,
                          String cargoItem1, String cargoItem2, String status) {
@@ -262,6 +234,25 @@ public class OrderService extends BaseService {
         }
     }
 
+    public void addItem(String uid, String cityName) {
+        try {
+            TransactionManager.beginTransaction();
+            OrderEntity order = orderDao.findByUid(uid);
+            CityEntity city = cityDao.findByName(cityName);
+            if (order != null && city != null) {
+                OrderItemEntity item = new OrderItemEntity();
+                item.setItemNumber(order.getItems().size() + 1);
+                item.setCity(city);
+                item.setOrder(order);
+                order.getItems().add(item);
+                this.calcDistanceAndTime((List<OrderItemEntity>) order.getItems());
+            }
+            TransactionManager.commit();
+        } catch (Exception e) {
+            TransactionManager.rollback();
+        }
+    }
+
     public List<OrderItemEntity> getListOfItems(String uid) {
         List<OrderItemEntity> items = null;
         try {
@@ -269,29 +260,34 @@ public class OrderService extends BaseService {
             OrderEntity order = new OrderDaoImpl(TransactionManager.getEntityManager()).findByUid(uid);
             if (order != null) {
                 items = (List<OrderItemEntity>) order.getItems();
-                OrderItemEntity prevItem = null;
-                for (OrderItemEntity item : items) {
-                    if (prevItem != null) {
-                        CityEntity city1 = item.getCity();
-                        CityEntity city2 = prevItem.getCity();
-                        DistanceEntity distanceEntity = distanceDao.findDistance(city1, city2);
-                        BigDecimal fullDistance = prevItem.getFullDistance().add(distanceEntity.getDistance());
-                        item.setDistance(distanceEntity.getDistance());
-                        item.setFullDistance(fullDistance);
-                    } else {
-                        item.setDistance(new BigDecimal(0));
-                        item.setFullDistance(new BigDecimal(0));
-                    }
-                    prevItem = item;
-                }
+                this.calcDistanceAndTime(items);
             }
             TransactionManager.commit();
         } catch (Exception e) {
             items = null;
             TransactionManager.rollback();
         }
-
         return items;
+    }
+
+    private void calcDistanceAndTime(List<OrderItemEntity> items) {
+        OrderItemEntity prevItem = null;
+        for (OrderItemEntity item : items) {
+            if (prevItem != null) {
+                CityEntity city1 = item.getCity();
+                CityEntity city2 = prevItem.getCity();
+                DistanceEntity distanceEntity = distanceDao.findDistance(city1, city2);
+                BigDecimal fullDistance = prevItem.getFullDistance().add(distanceEntity.getDistance());
+                item.setDistance(distanceEntity.getDistance());
+                item.setFullDistance(fullDistance);
+                item.setTime(distanceEntity.getDistance().intValue()/60);
+                item.setFullTime(fullDistance.intValue()/60);
+            } else {
+                item.setDistance(new BigDecimal(0));
+                item.setFullDistance(new BigDecimal(0));
+            }
+            prevItem = item;
+        }
     }
 
     public Set<CityEntity> getListOfCities(String uid) {
@@ -355,7 +351,7 @@ public class OrderService extends BaseService {
             Iterator<VehicleEntity> iterator = vehicles.iterator();
             while (iterator.hasNext()) {
                 VehicleEntity vehicleEntity = iterator.next();
-                if (vehicleEntity.getCapacity().compareTo(maxMass) < 0) {
+                if (vehicleEntity.getOrder() != null || vehicleEntity.getCapacity().compareTo(maxMass) < 0) {
                     iterator.remove();
                 }
             }
@@ -389,13 +385,20 @@ public class OrderService extends BaseService {
         return maxMass;
     }
 
-    public List<DriverEntity> getListOfDrivers(String uid) {
+    public List<DriverEntity> getListOfPossibleDrivers(String uid) {
         List<DriverEntity> drivers = new ArrayList<>();
         try {
             TransactionManager.beginTransaction();
             OrderEntity order = orderDao.findByUid(uid);
             if (order != null) {
-                drivers.addAll(order.getDrivers());
+                VehicleEntity vehicle = order.getVehicle();
+                if (vehicle != null && vehicle.getNumberOfDrivers() > order.getDrivers().size()) {
+                    for (DriverEntity driver : driverDao.getFreeDrivers()) {
+                        if (driver.getCity().getName().equals(vehicle.getCity().getName())) {
+                            drivers.add(driver);
+                        }
+                    }
+                }
             }
             TransactionManager.commit();
         } catch (Exception e) {
@@ -405,16 +408,14 @@ public class OrderService extends BaseService {
         return drivers;
     }
 
-    public List<DriverEntity> getListOfPossibleDrivers(String uid) {
+    public List<DriverEntity> getListOfDrivers(String uid) {
         List<DriverEntity> drivers = new ArrayList<>();
-        List<DriverEntity> allDrivers = driverDao.getAllEntities(DriverEntity.class);
         try {
             TransactionManager.beginTransaction();
             OrderEntity order = orderDao.findByUid(uid);
-            for (DriverEntity driver : allDrivers) {
-                if (!order.getDrivers().contains(driver)) {
-                    drivers.add(driver);
-                }
+            if (order != null) {
+                order.getDrivers().size();
+                drivers = (List<DriverEntity>) order.getDrivers();
             }
             TransactionManager.commit();
         } catch (Exception e) {

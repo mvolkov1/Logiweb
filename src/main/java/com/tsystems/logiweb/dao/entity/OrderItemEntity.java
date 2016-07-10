@@ -16,6 +16,26 @@ public class OrderItemEntity {
     private OrderEntity order;
     private BigDecimal distance;
     private BigDecimal fullDistance;
+    private int time = 0;
+    private int fullTime = 0;
+
+    @Transient
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    @Transient
+    public int getFullTime() {
+        return fullTime;
+    }
+
+    public void setFullTime(int fullTime) {
+        this.fullTime = fullTime;
+    }
 
     @Transient
     public BigDecimal getFullDistance() {
@@ -36,7 +56,8 @@ public class OrderItemEntity {
     }
 
 
-    @Id@GeneratedValue
+    @Id
+    @GeneratedValue
     @Column(name = "id", nullable = false)
     public long getId() {
         return id;

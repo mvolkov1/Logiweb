@@ -23,9 +23,8 @@ public class ServletFrontController extends HttpServlet {
     private OrderService orderService = new OrderService();
     private UserService userService = new UserService();
     private VehicleService vehicleService = new VehicleService();
-    private  DriverService driverService = new DriverService();
+    private DriverService driverService = new DriverService();
     private CityService cityService = new CityService();
-
 
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -142,6 +141,7 @@ public class ServletFrontController extends HttpServlet {
         orderService.setEntityManager(TransactionManager.getEntityManager());
         vehicleService.setEntityManager(TransactionManager.getEntityManager());
         driverService.setEntityManager(TransactionManager.getEntityManager());
+        cityService.setEntityManager(TransactionManager.getEntityManager());
 
         if (servletUrl != null) {
             String address = null;
@@ -190,7 +190,7 @@ public class ServletFrontController extends HttpServlet {
                     if (driver != null) {
                         request.setAttribute("uid", driver.getUid());
                         request.setAttribute("monthHours", driver.getMonthHours());
-                        request.setAttribute("driverCity", driver.getCity());
+                        request.setAttribute("driverCity", driver.getCity().getName());
                         request.setAttribute("status", driver.getStatus());
                         request.setAttribute("firstName", driver.getUser().getFirstName());
                         request.setAttribute("lastName", driver.getUser().getLastName());
@@ -245,13 +245,32 @@ public class ServletFrontController extends HttpServlet {
                         List<VehicleEntity> vehicles = orderService.getListOfVehicles(uid);
                         request.setAttribute("vehicles", vehicles);
                         VehicleEntity vehicle = orderEntity.getVehicle();
-                        if (vehicle != null) {
-                            request.setAttribute("vehicleVin", vehicle.getVin());
-                        }
+                        request.setAttribute("vehicle", vehicle);
                         List<DriverEntity> possibleDrivers = orderService.getListOfPossibleDrivers(uid);
                         request.setAttribute("possibleDrivers", possibleDrivers);
                         List<DriverEntity> drivers = orderService.getListOfDrivers(uid);
                         request.setAttribute("drivers", drivers);
+
+                        List<String> days = new ArrayList<>();
+                        for (int i = 1; i <= 31; i++) {
+                            days.add(String.format("%02d",i));
+                        }
+                        request.setAttribute("days", days);
+                        List<String> months = new ArrayList<>();
+                        for (int i = 1; i <= 12; i++) {
+                            months.add(String.format("%02d",i));
+                        }
+                        request.setAttribute("months", months);
+                        List<String> years = new ArrayList<>();
+                        for (int i = 2000; i <= 2100; i++) {
+                            years.add(String.format("%04d",i));
+                        }
+                        request.setAttribute("years", years);
+                        List<String> hours = new ArrayList<>();
+                        for (int i = 0; i <= 23; i++) {
+                            hours.add(String.format("%02d",i));
+                        }
+                        request.setAttribute("hours", hours);
                     }
 
 

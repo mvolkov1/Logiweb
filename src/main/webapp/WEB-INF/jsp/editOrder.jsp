@@ -50,35 +50,39 @@
 
 
     <h4>Start date and time</h4>
-    <form>
+    <form method="post">
         <table>
             <tr>
                 <td>
                     <table class="editOrderTable">
-                        <th>Start date</th>
-                        <th>Start time</th>
+                        <th align="center">Start date</th>
+                        <th align="center">Start time</th>
                         <tr>
-                            <td>
+                            <td align="center">
                                 <select name="day" id="day">
                                     <c:forEach var="day1" items="${days}">
-                                        <option value="${day1}">${day1}</option>
+                                        <option value="${day1}"
+                                        ${day1.equals(startDay)? 'selected="selected"' : ''}>${day1}</option>
                                     </c:forEach>
                                 </select>
                                 <select name="month" id="month">
                                     <c:forEach var="month1" items="${months}">
-                                        <option value="${month1}">${month1}</option>
+                                        <option value="${month1}"
+                                            ${month1.equals(startMonth)? 'selected="selected"' : ''}>${month1}</option>
                                     </c:forEach>
                                 </select>
                                 <select name="year" id="year">
                                     <c:forEach var="year1" items="${years}">
-                                        <option value="${year1}">${year1}</option>
+                                        <option value="${year1}"
+                                            ${year1.equals(startYear)? 'selected="selected"' : ''}>${year1}</option>
                                     </c:forEach>
                                 </select>
                             </td>
-                            <td>
+                            <td align="center">
                                 <select name="hour" id="hour">
                                     <c:forEach var="hour1" items="${hours}">
-                                        <option value="${hour1}">${hour1}</option>
+                                        <option value="${hour1}"
+                                            ${hour1.equals(startHour)? 'selected="selected"' : ''}>${hour1}</option>
                                     </c:forEach>
                                 </select>
                             </td>
@@ -150,7 +154,7 @@
     </table>
     <br>
 
-    <h4><c:out value="End time: "></c:out></h4>
+    <h4><c:out value="End time: ${endTime}"></c:out></h4>
     <br>
 
 

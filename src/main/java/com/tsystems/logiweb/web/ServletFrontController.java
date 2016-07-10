@@ -10,9 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -91,6 +89,12 @@ public class ServletFrontController extends HttpServlet {
                     if (step != null) {
                         if (step.equals("uid")) {
                             orderService.createOrder(uid);
+                        } else if (step.equals("startTime")) {
+                            String day = request.getParameter("day");
+                            String month = request.getParameter("month");
+                            String year = request.getParameter("year");
+                            String hour = request.getParameter("hour");
+                            orderService.setStartTime(uid, day, month, year, hour);
                         } else if (step.equals("item")) {
                             String city = request.getParameter("city");
                             orderService.addItem(uid, city);
@@ -253,24 +257,42 @@ public class ServletFrontController extends HttpServlet {
 
                         List<String> days = new ArrayList<>();
                         for (int i = 1; i <= 31; i++) {
-                            days.add(String.format("%02d",i));
+                            days.add(String.format("%02d", i));
                         }
                         request.setAttribute("days", days);
                         List<String> months = new ArrayList<>();
                         for (int i = 1; i <= 12; i++) {
-                            months.add(String.format("%02d",i));
+                            months.add(String.format("%02d", i));
                         }
                         request.setAttribute("months", months);
                         List<String> years = new ArrayList<>();
                         for (int i = 2000; i <= 2100; i++) {
-                            years.add(String.format("%04d",i));
+                            years.add(String.format("%04d", i));
                         }
                         request.setAttribute("years", years);
                         List<String> hours = new ArrayList<>();
                         for (int i = 0; i <= 23; i++) {
-                            hours.add(String.format("%02d",i));
+                            hours.add(String.format("%02d", i));
                         }
                         request.setAttribute("hours", hours);
+                        Date startTime = orderEntity.getStartTime();
+                        if (startTime == null) {
+                            startTime = Calendar.getInstance().getTime();
+                        }
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(startTime);
+                        int year = cal.get(Calendar.YEAR);
+                        int month = cal.get(Calendar.MONTH) + 1;
+                        int day = cal.get(Calendar.DAY_OF_MONTH);
+                        int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+
+                        request.setAttribute("startDay", String.format("%02d", day));
+                        request.setAttribute("startMonth", String.format("%02d", month));
+                        request.setAttribute("startYear", String.format("%04d", year));
+                        request.setAttribute("startHour", String.format("%02d", hour));
+                        String endTime = orderService.getEndTime(uid);
+                        request.setAttribute("endTime", endTime);
                     }
 
 

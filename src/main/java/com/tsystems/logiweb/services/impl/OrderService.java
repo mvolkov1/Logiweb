@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +50,46 @@ public class OrderService extends BaseService {
                 TransactionManager.rollback();
             }
         }
+    }
+
+    public void setStartTime(String uid, String day, String month, String year, String hour) {
+        try {
+            TransactionManager.beginTransaction();
+            OrderEntity order = orderDao.findByUid(uid);
+            if (order != null) {
+                DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HH");
+                Date startTime = dateFormat.parse(year + month + day + "-" + hour);
+                order.setStartTime(startTime);
+            }
+            TransactionManager.commit();
+        } catch (Exception e) {
+            TransactionManager.rollback();
+        }
+    }
+
+    public String getEndTime(String uid) {
+        String endTime = "";
+        try {
+            TransactionManager.beginTransaction();
+            OrderEntity order = orderDao.findByUid(uid);
+            if (order != null) {
+                Date startTime = order.getStartTime();
+                if (order.getItems().size() > 0) {
+                    this.calcDistanceAndTime((List<OrderItemEntity>) order.getItems());
+                    int orderHours = ((List<OrderItemEntity>) order.getItems()).get(order.getItems().size() - 1).getFullTime();
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(startTime);
+                    cal.add(Calendar.HOUR, orderHours);
+                    Date newDate = cal.getTime();
+                    DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+                    endTime = df.format(newDate);
+                }
+            }
+            TransactionManager.commit();
+        } catch (Exception e) {
+            TransactionManager.rollback();
+        }
+        return endTime;
     }
 
     public void deleteItem(String uid, String itemNumber) {
@@ -280,8 +323,8 @@ public class OrderService extends BaseService {
                 BigDecimal fullDistance = prevItem.getFullDistance().add(distanceEntity.getDistance());
                 item.setDistance(distanceEntity.getDistance());
                 item.setFullDistance(fullDistance);
-                item.setTime(distanceEntity.getDistance().intValue()/60);
-                item.setFullTime(fullDistance.intValue()/60);
+                item.setTime(distanceEntity.getDistance().intValue() / 60);
+                item.setFullTime(fullDistance.intValue() / 60);
             } else {
                 item.setDistance(new BigDecimal(0));
                 item.setFullDistance(new BigDecimal(0));

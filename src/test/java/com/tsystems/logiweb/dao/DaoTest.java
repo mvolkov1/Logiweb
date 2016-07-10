@@ -3,6 +3,7 @@ package com.tsystems.logiweb.dao;
 import com.tsystems.logiweb.dao.api.*;
 import com.tsystems.logiweb.dao.entity.*;
 import com.tsystems.logiweb.dao.impl.*;
+import com.tsystems.logiweb.services.TransactionManager;
 import com.tsystems.logiweb.services.impl.*;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,6 +50,11 @@ public class DaoTest {
 //
     @Test
     public void makeDaoTest() throws Exception {
+        cityService.setEntityManager(TransactionManager.getEntityManager());
+        distanceService.setEntityManager(TransactionManager.getEntityManager());
+        userService.setEntityManager(TransactionManager.getEntityManager());
+        vehicleService.setEntityManager(TransactionManager.getEntityManager());
+        driverService.setEntityManager(TransactionManager.getEntityManager());
         createCities();
         createDistances();
         createUsers();

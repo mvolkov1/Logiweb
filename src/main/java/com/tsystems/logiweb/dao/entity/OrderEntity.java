@@ -1,8 +1,10 @@
 package com.tsystems.logiweb.dao.entity;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * Created by mvolkov on 12.06.2016.
@@ -14,6 +16,19 @@ public class OrderEntity {
     private long id;
     private String uid;
     private short isCompleted;
+    private Date startTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="startTime")
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+
 
     private VehicleEntity vehicle;
     private Collection<OrderItemEntity> items = new ArrayList<>();

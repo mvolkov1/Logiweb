@@ -6,11 +6,13 @@ import com.tsystems.logiweb.dao.impl.*;
 import com.tsystems.logiweb.services.TransactionManager;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.Order;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -91,6 +93,9 @@ public class OrderService extends BaseService {
         }
         return endTime;
     }
+
+
+
 
     public void deleteItem(String uid, String itemNumber) {
         int nItem = 0;
@@ -282,7 +287,7 @@ public class OrderService extends BaseService {
             TransactionManager.beginTransaction();
             OrderEntity order = orderDao.findByUid(uid);
             CityEntity city = cityDao.findByName(cityName);
-            if (order != null && city != null) {
+            if (order != null && city != null && isPossibleToAddItemToOrder(order, city)) {
                 OrderItemEntity item = new OrderItemEntity();
                 item.setItemNumber(order.getItems().size() + 1);
                 item.setCity(city);
@@ -320,17 +325,33 @@ public class OrderService extends BaseService {
                 CityEntity city1 = item.getCity();
                 CityEntity city2 = prevItem.getCity();
                 DistanceEntity distanceEntity = distanceDao.findDistance(city1, city2);
-                BigDecimal fullDistance = prevItem.getFullDistance().add(distanceEntity.getDistance());
-                item.setDistance(distanceEntity.getDistance());
-                item.setFullDistance(fullDistance);
-                item.setTime(distanceEntity.getDistance().intValue() / 60);
-                item.setFullTime(fullDistance.intValue() / 60);
+                if (distanceEntity != null) {
+                    BigDecimal fullDistance = prevItem.getFullDistance().add(distanceEntity.getDistance());
+                    item.setDistance(distanceEntity.getDistance());
+                    item.setFullDistance(fullDistance);
+                    item.setTime((distanceEntity.getDistance().divide(new BigDecimal(60), 2, RoundingMode.HALF_UP)).toBigInteger().intValue());
+                    item.setFullTime((fullDistance.divide(new BigDecimal(60), 2, RoundingMode.HALF_UP)).toBigInteger().intValue());
+                }
+
             } else {
                 item.setDistance(new BigDecimal(0));
                 item.setFullDistance(new BigDecimal(0));
             }
             prevItem = item;
         }
+    }
+
+    private boolean isPossibleToAddItemToOrder(OrderEntity order, CityEntity city) {
+        OrderItemEntity lastItem = this.getLastItem(order);
+        if (lastItem != null && lastItem.getCity() != null && city != null) {
+            DistanceEntity distanceEntity = distanceDao.findDistance(lastItem.getCity(), city);
+            if (distanceEntity != null) {
+                BigDecimal fullDistance = lastItem.getFullDistance().add(distanceEntity.getDistance());
+                int fullTime = (fullDistance.divide(new BigDecimal(60), 2, RoundingMode.HALF_UP)).toBigInteger().intValue();
+                return (fullTime <= 176);
+            }
+        }
+        return false;
     }
 
     public Set<CityEntity> getListOfCities(String uid) {
@@ -341,7 +362,7 @@ public class OrderService extends BaseService {
             if (order != null) {
                 int nItems = order.getItems().size();
                 if (nItems > 0) {
-                    CityEntity lastCityEntity = ((List<OrderItemEntity>) order.getItems()).get(nItems - 1).getCity();
+                    CityEntity lastCityEntity = this.getLastItem(order).getCity();
                     if (lastCityEntity != null) {
                         String lastCity = lastCityEntity.getName();
                         List<DistanceEntity> distances = distanceDao.getAllEntities(DistanceEntity.class);
@@ -428,6 +449,40 @@ public class OrderService extends BaseService {
         return maxMass;
     }
 
+    private OrderItemEntity getLastItem(OrderEntity order) {
+        if (order != null) {
+            int nItems = order.getItems().size();
+            if (nItems > 0) {
+                OrderItemEntity lastItem = ((List<OrderItemEntity>) order.getItems()).get(nItems - 1);
+                return lastItem;
+            }
+        }
+        return null;
+    }
+
+    public int getHoursOfOrder(OrderEntity order) {
+        OrderItemEntity lastItem = this.getLastItem(order);
+        if (lastItem != null) {
+            return lastItem.getFullTime();
+        }
+        return 0;
+    }
+
+
+    private int getHoursUntilEndOfMonth(OrderEntity order) {
+        int nHoursPerDay = 8;
+        Date startTime = order.getStartTime();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startTime);
+        int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+        int nDaysOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        int nWorkingDays = nDaysOfMonth - dayOfMonth;
+        int nHours = nWorkingDays * nHoursPerDay;
+        int firstDayHours = 23 - cal.get(Calendar.HOUR_OF_DAY);
+        nHours += firstDayHours;
+        return nHours;
+    }
+
     public List<DriverEntity> getListOfPossibleDrivers(String uid) {
         List<DriverEntity> drivers = new ArrayList<>();
         try {
@@ -436,9 +491,17 @@ public class OrderService extends BaseService {
             if (order != null) {
                 VehicleEntity vehicle = order.getVehicle();
                 if (vehicle != null && vehicle.getNumberOfDrivers() > order.getDrivers().size()) {
+                    this.calcDistanceAndTime((List<OrderItemEntity>)order.getItems());
                     for (DriverEntity driver : driverDao.getFreeDrivers()) {
                         if (driver.getCity().getName().equals(vehicle.getCity().getName())) {
-                            drivers.add(driver);
+                            int nHours = this.getHoursOfOrder(order);
+                            if (nHours > this.getHoursUntilEndOfMonth(order) )
+                            {
+                                nHours = this.getHoursUntilEndOfMonth(order);
+                            }
+                            if (nHours < (176 - driver.getMonthHours())) {
+                                drivers.add(driver);
+                            }
                         }
                     }
                 }

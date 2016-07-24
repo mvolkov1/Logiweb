@@ -95,8 +95,6 @@ public class OrderService extends BaseService {
     }
 
 
-
-
     public void deleteItem(String uid, String itemNumber) {
         int nItem = 0;
         try {
@@ -343,10 +341,17 @@ public class OrderService extends BaseService {
 
     private boolean isPossibleToAddItemToOrder(OrderEntity order, CityEntity city) {
         OrderItemEntity lastItem = this.getLastItem(order);
-        if (lastItem != null && lastItem.getCity() != null && city != null) {
+        if (lastItem == null)
+            return true;
+        if (lastItem.getCity() != null && city != null) {
             DistanceEntity distanceEntity = distanceDao.findDistance(lastItem.getCity(), city);
             if (distanceEntity != null) {
-                BigDecimal fullDistance = lastItem.getFullDistance().add(distanceEntity.getDistance());
+                BigDecimal fullDistance = new BigDecimal(0);
+                if (lastItem.getFullDistance() != null) {
+                    fullDistance = lastItem.getFullDistance().add(distanceEntity.getDistance());
+                } else {
+                    fullDistance = distanceEntity.getDistance();
+                }
                 int fullTime = (fullDistance.divide(new BigDecimal(60), 2, RoundingMode.HALF_UP)).toBigInteger().intValue();
                 return (fullTime <= 176);
             }
@@ -491,12 +496,11 @@ public class OrderService extends BaseService {
             if (order != null) {
                 VehicleEntity vehicle = order.getVehicle();
                 if (vehicle != null && vehicle.getNumberOfDrivers() > order.getDrivers().size()) {
-                    this.calcDistanceAndTime((List<OrderItemEntity>)order.getItems());
+                    this.calcDistanceAndTime((List<OrderItemEntity>) order.getItems());
                     for (DriverEntity driver : driverDao.getFreeDrivers()) {
                         if (driver.getCity().getName().equals(vehicle.getCity().getName())) {
                             int nHours = this.getHoursOfOrder(order);
-                            if (nHours > this.getHoursUntilEndOfMonth(order) )
-                            {
+                            if (nHours > this.getHoursUntilEndOfMonth(order)) {
                                 nHours = this.getHoursUntilEndOfMonth(order);
                             }
                             if (nHours < (176 - driver.getMonthHours())) {

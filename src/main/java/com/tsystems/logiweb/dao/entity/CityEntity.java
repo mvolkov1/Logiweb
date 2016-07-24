@@ -1,6 +1,7 @@
 package com.tsystems.logiweb.dao.entity;
 
 import javax.persistence.*;
+import java.util.*;
 
 /**
  * Created by mvolkov on 12.06.2016.
@@ -12,11 +13,28 @@ public class CityEntity {
     private long id;
     private String name;
 
-    public CityEntity(){super();}
+    Set<CityEntity> neighbors = new HashSet<>();
 
-    public CityEntity(String city){this.name = city;}
+    @Transient
+    public Set<CityEntity> getNeighbors() {
+        return neighbors;
+    }
 
-    @Id@GeneratedValue
+    public void setNeighbors(Set<CityEntity> neighbors) {
+        this.neighbors = neighbors;
+    }
+
+
+    public CityEntity() {
+        super();
+    }
+
+    public CityEntity(String city) {
+        this.name = city;
+    }
+
+    @Id
+    @GeneratedValue
     @Column(name = "id", nullable = false)
     public long getId() {
         return id;

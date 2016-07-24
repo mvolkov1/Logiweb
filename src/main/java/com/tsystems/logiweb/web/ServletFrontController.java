@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
 
@@ -31,6 +32,7 @@ public class ServletFrontController extends HttpServlet {
         userService.setEntityManager(TransactionManager.getEntityManager());
         vehicleService.setEntityManager(TransactionManager.getEntityManager());
         driverService.setEntityManager(TransactionManager.getEntityManager());
+        cityService.setEntityManager(TransactionManager.getEntityManager());
 
         if (servletUrl != null) {
             URL url = new URL(servletUrl.toString());
@@ -39,16 +41,16 @@ public class ServletFrontController extends HttpServlet {
             if (path.equals("/Logiweb/") || path.equals("/Logiweb")) {
                 this.redirectLogin(request, response);
                 return;
-            } else if (path.equals("/Logiweb/vehicles")) {
+            } else if (path.equals("/Logiweb/vehicles") || path.equals("/Logiweb/editVehicle")) {
                 this.redirectVehiclesPost(request, response);
-                return;
-            } else if (path.equals("/Logiweb/editVehicle")) {
-                this.redirectVehiclesPost(request, response);
-            } else if (path.equals("/Logiweb/drivers")) {
+            } else if (path.equals("/Logiweb/drivers") || path.equals("/Logiweb/editDriver")) {
                 this.redirectDriversPost(request, response);
                 return;
             } else if (path.equals("/Logiweb/editOrder")) {
                 redirectEditOrderPost(request, response);
+                return;
+            } else if (path.equals("/Logiweb/cities")) {
+                this.redirectCitiesPost(request, response);
                 return;
             } else {
                 request.setAttribute("path", path);
@@ -68,6 +70,7 @@ public class ServletFrontController extends HttpServlet {
         vehicleService.setEntityManager(TransactionManager.getEntityManager());
         driverService.setEntityManager(TransactionManager.getEntityManager());
         cityService.setEntityManager(TransactionManager.getEntityManager());
+        userService.setEntityManager(TransactionManager.getEntityManager());
 
         if (servletUrl != null) {
             String address = null;
@@ -92,6 +95,12 @@ public class ServletFrontController extends HttpServlet {
                 return;
             } else if (path.equals("/Logiweb/editOrder")) {
                 this.redirectEditOrderGet(request, response);
+                return;
+            } else if (path.equals("/Logiweb/cities")) {
+                this.redirectCitiesGet(request, response);
+                return;
+            } else if (path.equals("/Logiweb/editCity")) {
+                this.redirectEditCityGet(request, response);
                 return;
             } else {
                 request.setAttribute("path", path);
@@ -150,20 +159,7 @@ public class ServletFrontController extends HttpServlet {
         response.sendRedirect("editOrder?uid=" + uid);
     }
 
-    private void redirectDriversPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String uid = request.getParameter("uid");
-        String saveDriver = request.getParameter("saveDriver");
-        if (uid != null && !uid.isEmpty()) {
-            if (saveDriver != null && saveDriver.equals("true")) {
-                String oldUid = request.getParameter("oldUid");
-                String monthHours = request.getParameter("monthHours");
-                String city = request.getParameter("city");
-                String status = request.getParameter("status1");
-                driverService.saveDriver(uid, oldUid, monthHours, status, city);
-            }
-        }
-        response.sendRedirect("drivers");
-    }
+
 
     public void redirectLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String login = request.getParameter("login");
@@ -197,6 +193,50 @@ public class ServletFrontController extends HttpServlet {
             }
         }
         response.sendRedirect("vehicles");
+    }
+
+    private void redirectDriversPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String uid = request.getParameter("uid");
+        String saveDriver = request.getParameter("saveDriver");
+        if (uid != null && !uid.isEmpty()) {
+            if (saveDriver != null) {
+                String oldUid = request.getParameter("oldUid");
+                String firstName = request.getParameter("firstName");
+                String lastName = request.getParameter("lastName");
+                String login = request.getParameter("login");
+                String password = request.getParameter("password");
+                String monthHours = request.getParameter("monthHours");
+                String city = request.getParameter("city");
+                String status = request.getParameter("status1");
+                driverService.saveDriver(uid, firstName, lastName, login, password, oldUid, monthHours, status, city);
+            }
+        }
+        response.sendRedirect("drivers");
+    }
+
+    private void redirectCitiesGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<CityEntity> cities = cityService.getListOfCities();
+        request.setAttribute("list", cities);
+        request.getRequestDispatcher("/WEB-INF/jsp/cities.jsp").forward(request, response);
+    }
+
+    private void redirectCitiesPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String newCity = request.getParameter("newCity");
+        cityService.addCity(newCity);
+        response.sendRedirect("cities");
+    }
+
+    private void redirectEditCityGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String cityName = request.getParameter("cityName");
+        Map<String, BigDecimal> neighbors  =cityService.getListOfNeighborCities(cityName);
+        Set<CityEntity> possibleNeighbors = cityService.getListOfPossibleNeighbors(cityName);
+        request.setAttribute("cityName", cityName);
+        request.setAttribute("neighbors", neighbors);
+        request.setAttribute("possibleNeighbors", possibleNeighbors);
+        request.getRequestDispatcher("/WEB-INF/jsp/editCity.jsp").forward(request, response);
     }
 
     private void redirectVehiclesGet(HttpServletRequest request, HttpServletResponse response)
@@ -263,6 +303,8 @@ public class ServletFrontController extends HttpServlet {
                 request.setAttribute("status", driver.getStatus());
                 request.setAttribute("firstName", driver.getUser().getFirstName());
                 request.setAttribute("lastName", driver.getUser().getLastName());
+                request.setAttribute("login", driver.getUser().getLogin());
+                request.setAttribute("password", driver.getUser().getPassword());
             }
             if (request.getParameter("deleteDriver") != null) {
                 request.setAttribute("deleteDriver", "true");

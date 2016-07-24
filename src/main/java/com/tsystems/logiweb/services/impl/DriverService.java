@@ -74,20 +74,31 @@ public class DriverService extends BaseService {
         return driver;
     }
 
-    public void saveDriver(String uid, String oldUid, String monthHours, String status, String city) {
-        if (oldUid != null && !oldUid.isEmpty() && monthHours != null && status != null && city != null) {
+    public void saveDriver(String uid, String firstName, String lastName, String login, String password,
+                           String oldUid, String monthHours, String status, String city) {
+        if (monthHours != null && status != null && city != null) {
             try {
                 TransactionManager.beginTransaction();
                 DriverEntity driverEntity = driverDao.findByUid(oldUid);
-                if (driverEntity != null) {
-                    CityEntity cityEntity = cityDao.findByName(city);
+                if (driverEntity == null) {
+                    UserEntity user = new UserEntity();
+                    user.setFirstName(firstName);
+                    user.setLastName(lastName);
+                    user.setRole("driver");
+                    user.setLogin(login);
+                    user.setPassword(password);
+                    driverEntity = new DriverEntity();
                     driverEntity.setUid(uid);
-                    driverEntity.setCity(cityEntity);
-                    driverEntity.setStatus(status);
-                    driverEntity.setMonthHours(Integer.parseInt(monthHours));
-                    driverDao.save(driverEntity);
-                    TransactionManager.commit();
+                    driverEntity.setUser(user);
                 }
+                CityEntity cityEntity = cityDao.findByName(city);
+                driverEntity.setUid(uid);
+                driverEntity.setCity(cityEntity);
+                driverEntity.setStatus(status);
+                driverEntity.setMonthHours(Integer.parseInt(monthHours));
+                driverDao.save(driverEntity);
+                TransactionManager.commit();
+
             } catch (Exception e) {
                 TransactionManager.rollback();
             }

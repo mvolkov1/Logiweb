@@ -1,3 +1,10 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: mvolkov
+  Date: 24.07.2016
+  Time: 20:57
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
@@ -8,59 +15,52 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
-    <title>Orders</title>
+    <title>Cities</title>
     <style> <%@include file="../css/body.css" %> </style>
     <style> <%@include file="../css/tables.css" %> </style>
     <style> <%@include file="../css/nav.css" %> </style>
     <style> <%@include file="../css/right.css" %> </style>
     <style> <%@include file="../css/buttons.css" %> </style>
-    <script>
-        function confirmDelete() {
-            return confirm("Delete order?");
-        }
-    </script>
+
+    <script> <%@include file="../js/validateCityInput.js" %> </script>
+
 </head>
 <body>
 <!-- Site navigation menu -->
 <ul class="navbar">
     <li><a href="vehicles">Vehicles</a></li>
     <li><a href="drivers">Drivers</a></li>
-    <li><a href="orders" class="active">Orders</a></li>
-    <li><a href="cities">Cities</a></li>
+    <li><a href="orders">Orders</a></li>
+    <li><a href="cities" class="active">Cities</a></li>
 </ul>
 
 
 <div class="right">
+
     <table>
-        <tr><td>
-            <c:if test="${fn:length(list) > 0}">
+        <tr>
+            <td>
                 <table class="resultTable">
-                    <caption><h1>Orders</h1></caption>
-                    <th>ID</th>
-                    <th>Vehicle</th>
-                    <th>Status</th>
+                    <caption><h1>Cities</h1></caption>
+                    <th>City</th>
                     <th></th>
-                    <c:forEach var="order" items="${list}">
+                    <tr>
+                        <form action="cities" method="post">
+                            <td><input type="text" name="newCity" id="newCity"></td>
+                            <td>
+                                <input type="submit" value="Add new city" class="buttonInCell" onclick="return validateCity()">
+                            </td>
+                        </form>
+                    </tr>
+                    <c:forEach var="city1" items="${list}">
                         <tr>
-                            <td><a href="editOrder?uid=${order.uid}" class="tableRef"> ${order.uid}</a></td>
-                            <td><a href="editVehicle?vin=${order.getVehicleVin()}"> ${order.getVehicleVin()}</a></td>
-                            <td> ${order.getIsCompleted()==0 ? 'not completed' : 'completed'} </td>
-                            <td><a href="orders?deleteOrder=true&uid=${order.uid}">Delete</a></td>
+                            <td><a href="editCity?cityName=${city1.name}" class="tableRef"> ${city1.name}</a></td>
+                            <td><a href="cities?deleteCity=true&name=${city1.name}"
+                                   onclick="return confirmDeleteCity()">Delete</a></td>
                         </tr>
                     </c:forEach>
                 </table>
                 <br>
-            </c:if>
-            <c:if test="${empty list}">
-                <h3>No orders found in the database</h3>
-                <br>
-            </c:if>
-        </td></tr>
-        <tr>
-            <td>
-            <form action="editOrder" method="get">
-                <input type="submit" value="Add order" class="buttonAddToTable">
-            </form>
             </td>
         </tr>
     </table>

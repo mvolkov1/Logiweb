@@ -27,6 +27,7 @@
     <li><a href="vehicles">Vehicles</a></li>
     <li><a href="drivers" class="active">Drivers</a></li>
     <li><a href="orders">Orders</a></li>
+    <li><a href="cities">Cities</a></li>
 </ul>
 
 <div class="right">
@@ -54,7 +55,8 @@
                                 <td><a href="editDriver?uid=${driver.uid}" class="tableRef"> ${driver.monthHours}</a>
                                 </td>
                                 <td><a href="editDriver?uid=${driver.uid}" class="tableRef"> ${driver.status}</a></td>
-                                <td><a href="editDriver?uid=${driver.uid}" class="tableRef"> ${driver.city.name}</a>
+                                <td><a href="editCity?cityName=${driver.city.name}"
+                                       class="tableRef"> ${driver.city.name}</a>
                                 </td>
                                 <td>
                                     <a href="editOrder?uid=${driver.order.uid}"> ${driver.order.uid}</a>

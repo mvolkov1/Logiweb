@@ -34,6 +34,7 @@
     <li><a href="vehicles">Vehicles</a></li>
     <li><a href="drivers">Drivers</a></li>
     <li><a href="orders" class="active">Orders</a></li>
+    <li><a href="cities">Cities</a></li>
 </ul>
 
 <div class="right">

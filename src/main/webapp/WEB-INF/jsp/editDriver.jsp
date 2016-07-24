@@ -25,6 +25,7 @@
     <li><a href="vehicles">Vehicles</a></li>
     <li><a href="drivers" class="active">Drivers</a></li>
     <li><a href="orders">Orders</a></li>
+    <li><a href="cities">Cities</a></li>
 </ul>
 
 
@@ -51,6 +52,18 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Login</td>
+                    <td>
+                        <input type="text" value="${login}">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td>
+                        <input type="text"  value="${password}">
+                    </td>
+                </tr>
+                <tr>
                     <td>Month hours</td>
                     <td><input type="text" value="${monthHours}" readonly></td>
                 </tr>
@@ -72,9 +85,9 @@
     </c:if>
 
     <c:if test="${not empty editDriver}">
-        <form onsubmit="return validateDriverInput()" action="drivers" method="post">
+        <form action="drivers" method="post">
             <table>
-                <caption><h3>Edit driver</h3></caption>
+                <caption><h1>Edit driver</h1></caption>
                 <tr>
                     <td>UID</td>
                     <td><input type="text" name="uid" id="uid" value="${uid}"></td>
@@ -89,6 +102,18 @@
                     <td>Last name</td>
                     <td>
                         <input type="text" name="lastName" uid="lastName" value="${lastName}">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Login</td>
+                    <td>
+                        <input type="text" name="login" uid="login" value="${login}">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Password</td>
+                    <td>
+                        <input type="text" name="password" uid="password" value="${password}">
                     </td>
                 </tr>
                 <tr>
@@ -121,7 +146,7 @@
             <input type="hidden" name="oldUid" value="${uid}">
             &nbsp;
             <input type="submit" name="cancelEditDriver" value="Cancel">
-            
+
         </form>
     </c:if>
 

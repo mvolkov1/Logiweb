@@ -1,10 +1,11 @@
 input.buttonInCell {
     background-color: transparent;/*#6CBF70;*/
-    border: none;
+    /*border: none;*/
     /*color: white;*/
     cursor: pointer;
-    font-weight: bold;
-    width: 100%;
+    /*font-weight: bold;*/
+    /*width: 100%;*/
+    alignment: left;
 }
 
 select.selectInCell {

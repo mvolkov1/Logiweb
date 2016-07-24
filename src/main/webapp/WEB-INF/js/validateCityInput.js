@@ -16,3 +16,22 @@ function validateCity() {
         return false;
     }
 }
+
+
+function confirmDeleteDistance() {
+    return confirm("Delete distance?");
+}
+
+
+function validateDistance() {
+
+    var distance = document.getElementById("distance").value;
+    if (!distance) {
+        alert('Please enter numeric value for distance');
+        return false;
+    }
+    if (isNaN(distance)) {
+        alert('Please enter numeric value for distance');
+        return false;
+    }
+}

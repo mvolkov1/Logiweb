@@ -24,6 +24,7 @@ public class ServletFrontController extends HttpServlet {
     private VehicleService vehicleService = new VehicleService();
     private DriverService driverService = new DriverService();
     private CityService cityService = new CityService();
+    private DistanceService distanceService = new DistanceService();
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -33,6 +34,7 @@ public class ServletFrontController extends HttpServlet {
         vehicleService.setEntityManager(TransactionManager.getEntityManager());
         driverService.setEntityManager(TransactionManager.getEntityManager());
         cityService.setEntityManager(TransactionManager.getEntityManager());
+        distanceService.setEntityManager(TransactionManager.getEntityManager());
 
         if (servletUrl != null) {
             URL url = new URL(servletUrl.toString());
@@ -51,6 +53,9 @@ public class ServletFrontController extends HttpServlet {
                 return;
             } else if (path.equals("/Logiweb/cities")) {
                 this.redirectCitiesPost(request, response);
+                return;
+            } else if (path.equals("/Logiweb/editCity")) {
+                this.redirectEditCityPost(request, response);
                 return;
             } else {
                 request.setAttribute("path", path);
@@ -71,6 +76,7 @@ public class ServletFrontController extends HttpServlet {
         driverService.setEntityManager(TransactionManager.getEntityManager());
         cityService.setEntityManager(TransactionManager.getEntityManager());
         userService.setEntityManager(TransactionManager.getEntityManager());
+        distanceService.setEntityManager(TransactionManager.getEntityManager());
 
         if (servletUrl != null) {
             String address = null;
@@ -226,6 +232,15 @@ public class ServletFrontController extends HttpServlet {
         String newCity = request.getParameter("newCity");
         cityService.addCity(newCity);
         response.sendRedirect("cities");
+    }
+
+    private void redirectEditCityPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String cityName = request.getParameter("cityName");
+        String newNeighbor = request.getParameter("newNeighbor");
+        String distance = request.getParameter("distance");
+        distanceService.addDistance(cityName, newNeighbor, Float.parseFloat(distance));
+        redirectEditCityGet(request,response);
     }
 
     private void redirectEditCityGet(HttpServletRequest request, HttpServletResponse response)

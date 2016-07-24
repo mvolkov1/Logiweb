@@ -22,6 +22,8 @@
     <style> <%@include file="../css/right.css" %> </style>
     <style> <%@include file="../css/buttons.css" %> </style>
 
+    <script> <%@include file="../js/validateCityInput.js" %> </script>
+
 </head>
 <body>
 <!-- Site navigation menu -->
@@ -57,10 +59,11 @@
                                 </select>
                             </td>
                             <td>
-                                <input type="text" name="distance">
+                                <input type="text" name="distance" id="distance">
                             </td>
                             <td>
-                                <input type="submit" name="addItem" value="Add distance" class="buttonInCell">
+                                <input type="submit" name="addDistance" value="Add distance"
+                                       class="buttonInCell" onclick="return validateDistance()">
                                 <input type="hidden" name="cityName" value="${cityName}">
                             </td>
                         </form>
@@ -70,7 +73,7 @@
                             <td><a href="editCity?cityName=${neighbor.key}" class="tableRef"> ${neighbor.key}</a></td>
                             <td>${neighbor.value}</td>
                             <td><a href="editCity?deleteCity=true&cityName=${neighbor.key}"
-                                   onclick="return confirmDelete()">Delete</a></td>
+                                   onclick="return confirmDeleteDistance()">Delete</a></td>
                         </tr>
                     </c:forEach>
                 </table>

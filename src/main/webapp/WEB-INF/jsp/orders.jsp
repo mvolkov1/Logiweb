@@ -30,39 +30,39 @@
 
 
 <div class="right">
-    <c:if test="${fn:length(list) > 0}">
-        <table class="resultTable">
-            <caption><h1>Orders</h1></caption>
-            <th>ID</th>
-            <th>Number of items</th>
-            <th>Vehicle</th>
-            <th>Is completed</th>
-            <c:forEach var="order" items="${list}">
-                <tr>
-                    <td><a href="editOrder?uid=${order.uid}" class="tableRef"> ${order.uid}</a></td>
-                    <td> ${order.getItems().size()} </td>
-                    <td> ${order.getVehicleVin()}</td>
-                    <td> ${order.getIsCompleted()} </td>
-                    <td align="center" method="post">
-                        <form method="get" onsubmit="return confirmDelete()">
-                            <input type="submit" value="Delete" class="buttonInCell">
-                            <input type="hidden" name="deleteOrder" value="true">
-                            <input type="hidden" name="uid" value=${order.uid}>
-                        </form>
-                    </td>
-                </tr>
-            </c:forEach>
-        </table>
-        <br>
-    </c:if>
-
-    <c:if test="${empty list}">
-        <h3>No orders found in the database</h3>
-    </c:if>
-
-    <form action="editOrder" method="get">
-        <input type="submit" value="Add order" class="buttonAddToTable">
-    </form>
+    <table>
+        <tr><td>
+            <c:if test="${fn:length(list) > 0}">
+                <table class="resultTable">
+                    <caption><h1>Orders</h1></caption>
+                    <th>ID</th>
+                    <th>Vehicle</th>
+                    <th>Status</th>
+                    <th></th>
+                    <c:forEach var="order" items="${list}">
+                        <tr>
+                            <td><a href="editOrder?uid=${order.uid}" class="tableRef"> ${order.uid}</a></td>
+                            <td><a href="editVehicle?vin=${order.getVehicleVin()}"> ${order.getVehicleVin()}</a></td>
+                            <td> ${order.getIsCompleted()==0 ? 'not completed' : 'completed'} </td>
+                            <td><a href="orders?deleteOrder=true&uid=${order.uid}">Delete</a></td>
+                        </tr>
+                    </c:forEach>
+                </table>
+                <br>
+            </c:if>
+            <c:if test="${empty list}">
+                <h3>No orders found in the database</h3>
+                <br>
+            </c:if>
+        </td></tr>
+        <tr>
+            <td>
+            <form action="editOrder" method="get">
+                <input type="submit" value="Add order" class="buttonAddToTable">
+            </form>
+            </td>
+        </tr>
+    </table>
 
 </div>
 <br>

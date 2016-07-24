@@ -1,4 +1,6 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,49 +31,57 @@
 </ul>
 
 <div class="right">
-    <table class="resultTable">
-        <caption><h1>Vehicles</h1></caption>
-        <th>VIN</th>
-        <th>Capacity</th>
-        <th>Number of drivers</th>
-        <th>City</th>
-        <th>Is available?</th>
-        <th>Order ID</th>
 
+    <table>
+        <tr>
+            <td>
+                <c:if test="${fn:length(list) > 0}">
+                    <table class="resultTable">
+                        <caption><h1>Vehicles</h1></caption>
+                        <th>VIN</th>
+                        <th>Capacity</th>
+                        <th>Number of drivers</th>
+                        <th>City</th>
+                        <th>Status</th>
+                        <th>Order ID</th>
+                        <th></th>
+                        <c:forEach var="vehicle" items="${list}">
+                            <tr>
+                                <td><a href="editVehicle?vin=${vehicle.vin}" class="tableRef"> ${vehicle.vin}</a></td>
+                                <td><a href="editVehicle?vin=${vehicle.vin}" class="tableRef"> ${vehicle.capacity}</a>
+                                </td>
+                                <td><a href="editVehicle?vin=${vehicle.vin}"
+                                       class="tableRef"> ${vehicle.numberOfDrivers}</a></td>
+                                <td><a href="editVehicle?vin=${vehicle.vin}" class="tableRef"> ${vehicle.city.name}</a>
+                                </td>
+                                <td><a href="editVehicle?vin=${vehicle.vin}"
+                                       class="tableRef"> ${vehicle.isAvailable == 0 ? "not available" : "available"}</a>
+                                </td>
+                                <td><a href="editOrder?uid=${vehicle.order.uid}"> ${vehicle.order.uid}</a>
+                                </td>
+                                <td><a href="vehicles?deleteVehicle=true&vin=${vehicle.vin}"
+                                       onclick="return confirmDelete()">Delete</a></td>
+                            </tr>
+                        </c:forEach>
+                    </table>
+                    <br>
+                </c:if>
+                <c:if test="${empty list}">
+                    <h3>No vehicles found in the database</h3>
+                    <br>
+                </c:if>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <form action="editVehicle" method="get">
+                    <input type="submit" value="Add new vehicle" class="buttonAddToTable">
+                    <input type="hidden" name="editVehicle" value="true">
+                </form>
+            </td>
+        </tr>
 
-        <c:forEach var="vehicle" items="${list}">
-            <tr>
-                <td> ${vehicle.vin} </td>
-                <td> ${vehicle.capacity} </td>
-                <td> ${vehicle.numberOfDrivers} </td>
-                <td> ${vehicle.city.name} </td>
-                <td>${vehicle.isAvailable == 0 ? "no" : "yes"}</td>
-                <td><a href="editOrder?uid=${vehicle.order.uid}"> ${vehicle.order.uid}</a>
-                </td>
-                <td align="center">
-                    <form action="editVehicle" method="get">
-                        <input type="submit" value="Edit" class="buttonInCell">
-                        <input type="hidden" name="vin" value=${vehicle.vin}>
-                    </form>
-                </td>
-                <td align="center">
-                    <form onsubmit="return confirmDelete()" method="get">
-                        <input type="submit" value="Delete" class="buttonInCell">
-                        <input type="hidden" name="deleteVehicle" value="true">
-                        <input type="hidden" name="vin" value=${vehicle.vin}>
-                    </form>
-                </td>
-            </tr>
-        </c:forEach>
     </table>
-
-
-    <p>
-    <form action="editVehicle" method="get">
-        <input type="submit" value="Add new vehicle" class="buttonAddToTable">
-    </form>
-
-    </p>
 
 </div>
 <br>

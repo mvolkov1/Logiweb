@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,34 +30,56 @@
 </ul>
 
 <div class="right">
-    <table class="resultTable">
-        <caption><h1>Drivers</h1></caption>
-        <th>ID</th>
-        <th>First name</th>
-        <th>Last name</th>
-        <th>Month hours</th>
-        <th>Status</th>
-        <th>City</th>
-        <th>Order ID</th>
-        <c:forEach var="driver" items="${list}">
-            <tr>
-                <td> ${driver.uid} </td>
-                <td> ${driver.user.firstName} </td>
-                <td> ${driver.user.lastName} </td>
-                <td> ${driver.monthHours} </td>
-                <td> ${driver.status} </td>
-                <td> ${driver.city.name} </td>
-                <td>
-                    <a href="editOrder?uid=${driver.order.uid}"> ${driver.order.uid}</a>
-                </td>
-                <td align="center">
-                    <form action="editDriver" method="get">
-                        <input type="submit" value="Edit" class="buttonInCell">
-                        <input type="hidden" name="uid" value=${driver.uid}>
-                    </form>
-                </td>
-            </tr>
-        </c:forEach>
+    <table>
+        <tr>
+            <td>
+                <c:if test="${fn:length(list) > 0}">
+                    <table class="resultTable">
+                        <caption><h1>Drivers</h1></caption>
+                        <th>ID</th>
+                        <th>First name</th>
+                        <th>Last name</th>
+                        <th>Month hours</th>
+                        <th>Status</th>
+                        <th>City</th>
+                        <th>Order ID</th>
+                        <th></th>
+                        <c:forEach var="driver" items="${list}">
+                            <tr>
+                                <td><a href="editDriver?uid=${driver.uid}" class="tableRef"> ${driver.uid}</a></td>
+                                <td><a href="editDriver?uid=${driver.uid}"
+                                       class="tableRef"> ${driver.user.firstName}</a></td>
+                                <td><a href="editDriver?uid=${driver.uid}" class="tableRef"> ${driver.user.lastName}</a>
+                                </td>
+                                <td><a href="editDriver?uid=${driver.uid}" class="tableRef"> ${driver.monthHours}</a>
+                                </td>
+                                <td><a href="editDriver?uid=${driver.uid}" class="tableRef"> ${driver.status}</a></td>
+                                <td><a href="editDriver?uid=${driver.uid}" class="tableRef"> ${driver.city.name}</a>
+                                </td>
+                                <td>
+                                    <a href="editOrder?uid=${driver.order.uid}"> ${driver.order.uid}</a>
+                                </td>
+                                <td><a href="drivers?deleteDriver=true&uid=${driver.uid}"
+                                       onclick="return confirmDelete()">Delete</a></td>
+                            </tr>
+                        </c:forEach>
+                    </table>
+                    <br>
+                </c:if>
+                <c:if test="${empty list}">
+                    <h3>No drivers found in the database</h3>
+                    <br>
+                </c:if>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <form action="editDriver" method="get">
+                    <input type="submit" value="Add new driver" class="buttonAddToTable">
+                    <input type="hidden" name="editDriver" value="true">
+                </form>
+            </td>
+        </tr>
     </table>
 
 </div>

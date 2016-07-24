@@ -24,21 +24,84 @@ public class ServletFrontController extends HttpServlet {
     private DriverService driverService = new DriverService();
     private CityService cityService = new CityService();
 
-    private void redirectVehiclesPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String saveVehicle = request.getParameter("saveVehicle");
-        String vin = request.getParameter("vin");
-        if (vin != null && !vin.isEmpty()) {
-            if (saveVehicle != null && saveVehicle.equals("true")) {
-                String capacity = request.getParameter("capacity");
-                String numberOfDrivers = request.getParameter("numberOfDrivers");
-                String city = request.getParameter("city");
-                String isAvailable = request.getParameter("isAvailable1");
-                isAvailable = isAvailable.equals("no") ? "0" : "1";
-                vehicleService.saveVehicle(vin, capacity, numberOfDrivers, city, isAvailable);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        StringBuffer servletUrl = request.getRequestURL();
+        orderService.setEntityManager(TransactionManager.getEntityManager());
+        userService.setEntityManager(TransactionManager.getEntityManager());
+        vehicleService.setEntityManager(TransactionManager.getEntityManager());
+        driverService.setEntityManager(TransactionManager.getEntityManager());
+
+        if (servletUrl != null) {
+            URL url = new URL(servletUrl.toString());
+            String path = url.getPath();
+            String address = null;
+            if (path.equals("/Logiweb/") || path.equals("/Logiweb")) {
+                this.redirectLogin(request, response);
+                return;
+            } else if (path.equals("/Logiweb/vehicles")) {
+                this.redirectVehiclesPost(request, response);
+                return;
+            } else if (path.equals("/Logiweb/editVehicle")) {
+                this.redirectVehiclesPost(request, response);
+            } else if (path.equals("/Logiweb/drivers")) {
+                this.redirectDriversPost(request, response);
+                return;
+            } else if (path.equals("/Logiweb/editOrder")) {
+                redirectEditOrderPost(request, response);
+                return;
+            } else {
+                request.setAttribute("path", path);
+                request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
+            }
+            if (address != null) {
+                request.getRequestDispatcher(address).forward(request, response);
             }
         }
-        response.sendRedirect("vehicles");
     }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        StringBuffer servletUrl = request.getRequestURL();
+
+        orderService.setEntityManager(TransactionManager.getEntityManager());
+        vehicleService.setEntityManager(TransactionManager.getEntityManager());
+        driverService.setEntityManager(TransactionManager.getEntityManager());
+        cityService.setEntityManager(TransactionManager.getEntityManager());
+
+        if (servletUrl != null) {
+            String address = null;
+            URL url = new URL(servletUrl.toString());
+            String path = url.getPath();
+            if (path.equals("/Logiweb") || path.equals("/Logiweb/")) {
+                request.getRequestDispatcher("/login.jsp").forward(request, response);
+            } else if (path.equals("/Logiweb/vehicles")) {
+                this.redirectVehiclesGet(request, response);
+                return;
+            } else if (path.equals("/Logiweb/editVehicle")) {
+                this.redirectEditVehicleGet(request, response);
+                return;
+            } else if (path.equals("/Logiweb/drivers")) {
+                this.redirectDriversGet(request, response);
+                return;
+            } else if (path.equals("/Logiweb/editDriver")) {
+                this.redirectEditDriverGet(request, response);
+                return;
+            } else if (path.equals("/Logiweb/orders")) {
+                this.redirectOrdersGet(request, response);
+                return;
+            } else if (path.equals("/Logiweb/editOrder")) {
+                this.redirectEditOrderGet(request, response);
+                return;
+            } else {
+                request.setAttribute("path", path);
+                request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
+                return;
+            }
+        }
+        request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
+    }
+
 
     private void redirectEditOrderPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uid = request.getParameter("uid");
@@ -120,11 +183,28 @@ public class ServletFrontController extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
     }
 
-    private void redirectVehiclesGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String deleteVehicle = request.getParameter("deleteVehicle");
+    private void redirectVehiclesPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String saveVehicle = request.getParameter("saveVehicle");
         String vin = request.getParameter("vin");
         if (vin != null && !vin.isEmpty()) {
-            if (deleteVehicle != null && deleteVehicle.equals("true")) {
+            if (saveVehicle != null) {
+                String capacity = request.getParameter("capacity");
+                String numberOfDrivers = request.getParameter("numberOfDrivers");
+                String city = request.getParameter("city");
+                String isAvailable = request.getParameter("isAvailable1");
+                isAvailable = isAvailable.equals("no") ? "0" : "1";
+                vehicleService.saveVehicle(vin, capacity, numberOfDrivers, city, isAvailable);
+            }
+        }
+        response.sendRedirect("vehicles");
+    }
+
+    private void redirectVehiclesGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String vin = request.getParameter("vin");
+        if (vin != null && !vin.isEmpty()) {
+            String deleteVehicle = request.getParameter("deleteVehicle");
+            if (deleteVehicle != null) {
                 vehicleService.deleteVehicle(vin);
             }
         }
@@ -134,6 +214,13 @@ public class ServletFrontController extends HttpServlet {
     }
 
     private void redirectDriversGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String uid = request.getParameter("uid");
+        if (uid != null && !uid.isEmpty()) {
+            String deleteDriver = request.getParameter("deleteDriver");
+            if (deleteDriver != null) {
+                driverService.deleteDriver(uid);
+            }
+        }
         List<DriverEntity> drivers = driverService.getListOfDrivers();
         request.setAttribute("list", drivers);
         request.getRequestDispatcher("/WEB-INF/jsp/drivers.jsp").forward(request, response);
@@ -148,12 +235,20 @@ public class ServletFrontController extends HttpServlet {
                 request.setAttribute("capacity", vehicle.getCapacity());
                 request.setAttribute("numberOfDrivers", vehicle.getNumberOfDrivers());
                 request.setAttribute("isAvailable", ((Short) vehicle.getIsAvailable()).equals((short) 0) ? "no" : "yes");
-                request.setAttribute("vehicleCity", vehicle.getCity());
+                request.setAttribute("vehicleCity", vehicle.getCity().getName());
                 request.setAttribute("order", vehicle.getOrder());
             }
+            if (request.getParameter("deleteVehicle") != null) {
+                request.setAttribute("deleteVehicle", "true");
+                redirectVehiclesGet(request, response);
+                return;
+            }
         }
-        List<CityEntity> cities = cityService.getListOfCities();
-        request.setAttribute("cities", cities);
+        if (request.getParameter("editVehicle") != null) {
+            request.setAttribute("editVehicle", "true");
+            List<CityEntity> cities = cityService.getListOfCities();
+            request.setAttribute("cities", cities);
+        }
         request.getRequestDispatcher("/WEB-INF/jsp/editVehicle.jsp").forward(request, response);
     }
 
@@ -169,11 +264,21 @@ public class ServletFrontController extends HttpServlet {
                 request.setAttribute("firstName", driver.getUser().getFirstName());
                 request.setAttribute("lastName", driver.getUser().getLastName());
             }
+            if (request.getParameter("deleteDriver") != null) {
+                request.setAttribute("deleteDriver", "true");
+                redirectDriversGet(request, response);
+                return;
+            }
         }
-        List<CityEntity> cities = cityService.getListOfCities();
-        request.setAttribute("cities", cities);
+        if (request.getParameter("editDriver") != null) {
+            request.setAttribute("editDriver", "true");
+            List<CityEntity> cities = cityService.getListOfCities();
+            request.setAttribute("cities", cities);
+        }
         request.getRequestDispatcher("/WEB-INF/jsp/editDriver.jsp").forward(request, response);
     }
+
+
 
     public void redirectOrdersGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uid = request.getParameter("uid");
@@ -188,40 +293,6 @@ public class ServletFrontController extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/jsp/orders.jsp").forward(request, response);
     }
 
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        StringBuffer servletUrl = request.getRequestURL();
-        orderService.setEntityManager(TransactionManager.getEntityManager());
-        userService.setEntityManager(TransactionManager.getEntityManager());
-        vehicleService.setEntityManager(TransactionManager.getEntityManager());
-        driverService.setEntityManager(TransactionManager.getEntityManager());
-
-        if (servletUrl != null) {
-            URL url = new URL(servletUrl.toString());
-            String path = url.getPath();
-            String address = null;
-            if (path.equals("/Logiweb/") || path.equals("/Logiweb")) {
-                this.redirectLogin(request, response);
-                return;
-            } else if (path.equals("/Logiweb/vehicles")) {
-                this.redirectVehiclesPost(request, response);
-                return;
-            } else if (path.equals("/Logiweb/drivers")) {
-                this.redirectDriversPost(request, response);
-                return;
-            } else if (path.equals("/Logiweb/editOrder")) {
-                redirectEditOrderPost(request, response);
-                return;
-            } else {
-                request.setAttribute("path", path);
-                request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
-            }
-            if (address != null) {
-                request.getRequestDispatcher(address).forward(request, response);
-            }
-        }
-    }
 
     public void redirectEditOrderGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uid = request.getParameter("uid");
@@ -304,46 +375,5 @@ public class ServletFrontController extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/jsp/editOrder.jsp").forward(request, response);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        StringBuffer servletUrl = request.getRequestURL();
-
-        orderService.setEntityManager(TransactionManager.getEntityManager());
-        vehicleService.setEntityManager(TransactionManager.getEntityManager());
-        driverService.setEntityManager(TransactionManager.getEntityManager());
-        cityService.setEntityManager(TransactionManager.getEntityManager());
-
-        if (servletUrl != null) {
-            String address = null;
-            URL url = new URL(servletUrl.toString());
-            String path = url.getPath();
-            if (path.equals("/Logiweb") || path.equals("/Logiweb/")) {
-                request.getRequestDispatcher("/login.jsp").forward(request, response);
-            } else if (path.equals("/Logiweb/vehicles")) {
-                this.redirectVehiclesGet(request, response);
-                return;
-            } else if (path.equals("/Logiweb/editVehicle")) {
-                this.redirectEditVehicleGet(request, response);
-                return;
-            } else if (path.equals("/Logiweb/drivers")) {
-                this.redirectDriversGet(request, response);
-                return;
-            } else if (path.equals("/Logiweb/editDriver")) {
-                this.redirectEditDriverGet(request, response);
-                return;
-            } else if (path.equals("/Logiweb/orders")) {
-                this.redirectOrdersGet(request, response);
-                return;
-            } else if (path.equals("/Logiweb/editOrder")) {
-                this.redirectEditOrderGet(request, response);
-                return;
-            } else {
-                request.setAttribute("path", path);
-                request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
-                return;
-            }
-        }
-        request.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(request, response);
-    }
 
 }

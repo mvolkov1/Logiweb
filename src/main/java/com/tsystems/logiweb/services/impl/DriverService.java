@@ -93,6 +93,17 @@ public class DriverService extends BaseService {
             }
         }
     }
+
+    public void deleteDriver(String uid) {
+        try {
+            TransactionManager.beginTransaction();
+            driverDao.deleteByUid(uid);
+            TransactionManager.commit();
+        } catch (Exception e) {
+            TransactionManager.rollback();
+        }
+    }
+
 }
 
 

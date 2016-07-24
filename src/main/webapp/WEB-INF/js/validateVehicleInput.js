@@ -1,6 +1,11 @@
 /**
  * Created by mvolkov on 19.06.2016.
  */
+
+function confirmDeleteVehicle() {
+    return confirm("Delete vehicle?");
+}
+
 function isInt(value) {
     return !isNaN(value) &&
         parseInt(Number(value)) == value &&

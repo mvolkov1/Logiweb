@@ -4,6 +4,12 @@
 /**
  * Created by mvolkov on 19.06.2016.
  */
+
+function confirmDeleteDriver() {
+    return confirm("Delete driver?");
+}
+
+
 function isInt(value) {
     return !isNaN(value) &&
         parseInt(Number(value)) == value &&
